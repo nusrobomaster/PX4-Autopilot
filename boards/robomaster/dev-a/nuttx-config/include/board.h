@@ -222,8 +222,14 @@
 // #define GPIO_UART7_RX    GPIO_UART7_RX_1
 // #define GPIO_UART7_TX    GPIO_UART7_TX_1
 
-#define GPIO_USART1_RX GPIO_USART1_RX_2
-#define GPIO_USART1_TX GPIO_USART1_TX_1
+
+// For RoboMaster Dev C, the debug port is UART1
+// #define GPIO_USART1_RX GPIO_USART1_RX_2
+// #define GPIO_USART1_TX GPIO_USART1_TX_1
+
+// For RoboMaster Dev A, the debug port is UART6
+#define GPIO_USART6_RX GPIO_USART6_RX_2
+#define GPIO_USART6_TX GPIO_USART6_TX_2
 
 /* UART8 has no alternate pin config */
 
@@ -260,17 +266,22 @@
  * There are sensors on SPI1, and SPI2 is connected to the FRAM.
  */
 
-#define GPIO_SPI1_MISO   GPIO_SPI1_MISO_1
-#define GPIO_SPI1_MOSI   GPIO_SPI1_MOSI_1
-#define GPIO_SPI1_SCK    GPIO_SPI1_SCK_1
+// #define GPIO_SPI1_MISO   GPIO_SPI1_MISO_1
+// #define GPIO_SPI1_MOSI   GPIO_SPI1_MOSI_1
+// #define GPIO_SPI1_SCK    GPIO_SPI1_SCK_1
 
-#define GPIO_SPI2_MISO   GPIO_SPI2_MISO_1
-#define GPIO_SPI2_MOSI   GPIO_SPI2_MOSI_1
-#define GPIO_SPI2_SCK    GPIO_SPI2_SCK_2
+// #define GPIO_SPI2_MISO   GPIO_SPI2_MISO_1
+// #define GPIO_SPI2_MOSI   GPIO_SPI2_MOSI_1
+// #define GPIO_SPI2_SCK    GPIO_SPI2_SCK_2
 
+// For RoboMaster Dev Board A , SPI5 connects to MPU6500
 #define GPIO_SPI4_MISO	GPIO_SPI4_MISO_1
 #define GPIO_SPI4_MOSI	GPIO_SPI4_MOSI_1
 #define GPIO_SPI4_SCK	GPIO_SPI4_SCK_1
+
+#define GPIO_SPI5_MISO  GPIO_SPI5_MISO_1
+#define GPIO_SPI5_MOSI	GPIO_SPI5_MOSI_1
+#define GPIO_SPI5_SCK	GPIO_SPI5_SCK_1
 
 /* LED Definitions.  Needed if CONFIG_ARCH_LEDs is defined */
 

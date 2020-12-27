@@ -352,9 +352,8 @@ stm32_boardinitialize(void)
  *
  ****************************************************************************/
 
-static struct spi_dev_s *spi1;
-static struct spi_dev_s *spi2;
 static struct spi_dev_s *spi4;
+static struct spi_dev_s *spi5;
 static struct sdio_dev_s *sdio;
 
 __EXPORT int board_app_initialize(uintptr_t arg)
@@ -400,37 +399,37 @@ __EXPORT int board_app_initialize(uintptr_t arg)
 
 	/* Configure SPI-based devices */
 
-	spi1 = stm32_spibus_initialize(1);
+	// spi1 = stm32_spibus_initialize(1);
 
-	if (!spi1) {
-		syslog(LOG_ERR, "[boot] FAILED to initialize SPI port %d\n", 1);
-		led_on(LED_AMBER);
-		return -ENODEV;
-	}
+	// if (!spi1) {
+	// 	syslog(LOG_ERR, "[boot] FAILED to initialize SPI port %d\n", 1);
+	// 	led_on(LED_AMBER);
+	// 	return -ENODEV;
+	// }
 
-	/* Default SPI1 to 1MHz and de-assert the known chip selects. */
-	SPI_SETFREQUENCY(spi1, 10000000);
-	SPI_SETBITS(spi1, 8);
-	SPI_SETMODE(spi1, SPIDEV_MODE3);
-	up_udelay(20);
+	// /* Default SPI1 to 1MHz and de-assert the known chip selects. */
+	// SPI_SETFREQUENCY(spi1, 10000000);
+	// SPI_SETBITS(spi1, 8);
+	// SPI_SETMODE(spi1, SPIDEV_MODE3);
+	// up_udelay(20);
 
 	/* Get the SPI port for the FRAM */
 
-	spi2 = stm32_spibus_initialize(2);
+	// spi2 = stm32_spibus_initialize(2);
 
-	if (!spi2) {
-		syslog(LOG_ERR, "[boot] FAILED to initialize SPI port %d\n", 2);
-		led_on(LED_AMBER);
-		return -ENODEV;
-	}
+	// if (!spi2) {
+	// 	syslog(LOG_ERR, "[boot] FAILED to initialize SPI port %d\n", 2);
+	// 	led_on(LED_AMBER);
+	// 	return -ENODEV;
+	// }
 
-	/* Default SPI2 to 37.5 MHz (40 MHz rounded to nearest valid divider, F4 max)
-	 * and de-assert the known chip selects. */
+	// /* Default SPI2 to 37.5 MHz (40 MHz rounded to nearest valid divider, F4 max)
+	//  * and de-assert the known chip selects. */
 
-	// XXX start with 10.4 MHz in FRAM usage and go up to 37.5 once validated
-	SPI_SETFREQUENCY(spi2, 12 * 1000 * 1000);
-	SPI_SETBITS(spi2, 8);
-	SPI_SETMODE(spi2, SPIDEV_MODE3);
+	// // XXX start with 10.4 MHz in FRAM usage and go up to 37.5 once validated
+	// SPI_SETFREQUENCY(spi2, 12 * 1000 * 1000);
+	// SPI_SETBITS(spi2, 8);
+	// SPI_SETMODE(spi2, SPIDEV_MODE3);
 
 	spi4 = stm32_spibus_initialize(4);
 
@@ -444,6 +443,19 @@ __EXPORT int board_app_initialize(uintptr_t arg)
 	SPI_SETFREQUENCY(spi4, 10000000);
 	SPI_SETBITS(spi4, 8);
 	SPI_SETMODE(spi4, SPIDEV_MODE3);
+
+	spi5 = stm32_spibus_initialize(5);
+
+	if (!spi5) {
+		syslog(LOG_ERR, "[boot] FAILED to initialize SPI port %d\n", 5);
+		led_on(LED_AMBER);
+		return -ENODEV;
+	}
+
+	/* Default SPI4 to 1MHz and de-assert the known chip selects. */
+	SPI_SETFREQUENCY(spi5, 10000000);
+	SPI_SETBITS(spi5, 8);
+	SPI_SETMODE(spi5, SPIDEV_MODE3);
 
 #ifdef CONFIG_MMCSD
 	/* First, get an instance of the SDIO interface */
