@@ -41,6 +41,7 @@ WorkItemExample::WorkItemExample() :
 	ModuleParams(nullptr),
 	ScheduledWorkItem(MODULE_NAME, px4::wq_configurations::test1)
 {
+	PX4_DEBUG("WorkItemExample constructor done");
 }
 
 WorkItemExample::~WorkItemExample()
@@ -51,13 +52,15 @@ WorkItemExample::~WorkItemExample()
 
 bool WorkItemExample::init()
 {
+	PX4_DEBUG("WorkItemExample init ScheduleOnInterval");
 	ScheduleOnInterval(1000_us); // 1000 us interval, 1000 Hz rate
-
+	PX4_DEBUG("WorkItemExample init done");
 	return true;
 }
 
 void WorkItemExample::Run()
 {
+	PX4_DEBUG("WorkItemExample run()");
 	if (should_exit()) {
 		ScheduleClear();
 		exit_and_cleanup();
@@ -69,6 +72,8 @@ void WorkItemExample::Run()
 
 
 	// DO WORK
+
+	PX4_DEBUG("WorkItemExample do work");
 
 
 
@@ -93,12 +98,15 @@ void WorkItemExample::Run()
 
 int WorkItemExample::task_spawn(int argc, char *argv[])
 {
+	PX4_DEBUG("WorkItemExample task_spawn");
 	WorkItemExample *instance = new WorkItemExample();
 
 	if (instance) {
+		PX4_DEBUG("WorkItemExample _object.store");
 		_object.store(instance);
 		_task_id = task_id_is_work_queue;
 
+		PX4_DEBUG("WorkItemExample going to init");
 		if (instance->init()) {
 			return PX4_OK;
 		}

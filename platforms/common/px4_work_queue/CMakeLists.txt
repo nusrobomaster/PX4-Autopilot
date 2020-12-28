@@ -31,6 +31,8 @@
 #
 ############################################################################
 
+add_definitions(-DDEBUG_BUILD)
+
 px4_add_library(px4_work_queue
 	ScheduledWorkItem.cpp
 	WorkItem.cpp

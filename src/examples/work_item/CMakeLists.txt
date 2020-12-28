@@ -35,6 +35,7 @@ px4_add_module(
 	MODULE examples__work_item
 	MAIN work_item_example
 	COMPILE_FLAGS
+		-DDEBUG_BUILD
 	SRCS
 		WorkItemExample.cpp
 		WorkItemExample.hpp

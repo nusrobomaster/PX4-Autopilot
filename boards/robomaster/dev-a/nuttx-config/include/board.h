@@ -200,49 +200,31 @@
 
 /* UARTs */
 
-// #define GPIO_USART1_RX   GPIO_USART1_RX_1    /* Console in from IO */
-// #define GPIO_USART1_TX   0                   /* USART1 is RX-only */
+#define GPIO_USART1_RX   GPIO_USART1_RX_2    /* DBUS on pin B7, electrically inverted (transistor) */
+#define GPIO_USART1_TX   0                   /* USART1 is RX-only */
 
-// #define GPIO_USART2_RX   GPIO_USART2_RX_2
-// #define GPIO_USART2_TX   GPIO_USART2_TX_2
-// // #define GPIO_USART2_RTS  GPIO_USART2_RTS_2
-// // #define GPIO_USART2_CTS  GPIO_USART2_CTS_2
-
-// #define GPIO_USART3_RX   GPIO_USART3_RX_3
-// #define GPIO_USART3_TX   GPIO_USART3_TX_3
-// // #define GPIO_USART3_RTS  GPIO_USART3_RTS_2
-// // #define GPIO_USART3_CTS  GPIO_USART3_CTS_2
-
-// #define GPIO_UART4_RX    GPIO_UART4_RX_1
-// #define GPIO_UART4_TX    GPIO_UART4_TX_1
-
-// #define GPIO_USART6_RX   GPIO_USART6_RX_1
-// #define GPIO_USART6_TX   GPIO_USART6_TX_1
-
-// #define GPIO_UART7_RX    GPIO_UART7_RX_1
-// #define GPIO_UART7_TX    GPIO_UART7_TX_1
-
-
-// For RoboMaster Dev C, the debug port is UART1
-// #define GPIO_USART1_RX GPIO_USART1_RX_2
-// #define GPIO_USART1_TX GPIO_USART1_TX_1
+// UART2 is reserved for Bluetooth serial, not used
+// UART3 is reserved for On Board SDK, not used
 
 // For RoboMaster Dev A, the debug port is UART6
-#define GPIO_USART6_RX GPIO_USART6_RX_2
-#define GPIO_USART6_TX GPIO_USART6_TX_2
+#define GPIO_USART6_RX GPIO_USART6_RX_2 /* PG9 */
+#define GPIO_USART6_TX GPIO_USART6_TX_2 /* PG14 */
+
+#define GPIO_UART7_RX GPIO_UART7_RX_1 /* PE7 */
+#define GPIO_UART7_TX GPIO_UART7_TX_1 /* PE8 */
 
 /* UART8 has no alternate pin config */
 
 /* CAN
  *
- * CAN1 is routed to the onboard transceiver.
- * CAN2 is routed to the expansion connector.
+ * CAN1 is for ESCs.
+ * CAN2 are 4-pin connectors.
  */
 
 #define GPIO_CAN1_RX     GPIO_CAN1_RX_3
 #define GPIO_CAN1_TX     GPIO_CAN1_TX_3
 #define GPIO_CAN2_RX     GPIO_CAN2_RX_1
-#define GPIO_CAN2_TX     GPIO_CAN2_TX_2
+#define GPIO_CAN2_TX     GPIO_CAN2_TX_1
 
 /* I2C
  *
@@ -251,15 +233,16 @@
  * but are normally-high GPIOs.
  */
 
-#define GPIO_I2C1_SCL    GPIO_I2C1_SCL_2
-#define GPIO_I2C1_SDA    GPIO_I2C1_SDA_2
-#define GPIO_I2C1_SCL_GPIO (GPIO_OUTPUT|GPIO_OPENDRAIN|GPIO_SPEED_50MHz|GPIO_OUTPUT_SET|GPIO_PORTB|GPIO_PIN8)
-#define GPIO_I2C1_SDA_GPIO (GPIO_OUTPUT|GPIO_OPENDRAIN|GPIO_SPEED_50MHz|GPIO_OUTPUT_SET|GPIO_PORTB|GPIO_PIN9)
+// I2C1 is not used
+// #define GPIO_I2C1_SCL    GPIO_I2C1_SCL_2
+// #define GPIO_I2C1_SDA    GPIO_I2C1_SDA_2
+// #define GPIO_I2C1_SCL_GPIO (GPIO_OUTPUT|GPIO_OPENDRAIN|GPIO_SPEED_50MHz|GPIO_OUTPUT_SET|GPIO_PORTB|GPIO_PIN8)
+// #define GPIO_I2C1_SDA_GPIO (GPIO_OUTPUT|GPIO_OPENDRAIN|GPIO_SPEED_50MHz|GPIO_OUTPUT_SET|GPIO_PORTB|GPIO_PIN9)
 
-#define GPIO_I2C2_SCL    GPIO_I2C2_SCL_1
-#define GPIO_I2C2_SDA    GPIO_I2C2_SDA_1
-#define GPIO_I2C2_SCL_GPIO (GPIO_OUTPUT|GPIO_OPENDRAIN|GPIO_SPEED_50MHz|GPIO_OUTPUT_SET|GPIO_PORTB|GPIO_PIN10)
-#define GPIO_I2C2_SDA_GPIO (GPIO_OUTPUT|GPIO_OPENDRAIN|GPIO_SPEED_50MHz|GPIO_OUTPUT_SET|GPIO_PORTB|GPIO_PIN11)
+#define GPIO_I2C2_SCL    GPIO_I2C2_SCL_2
+#define GPIO_I2C2_SDA    GPIO_I2C2_SDA_2
+#define GPIO_I2C2_SCL_GPIO (GPIO_OUTPUT|GPIO_OPENDRAIN|GPIO_SPEED_50MHz|GPIO_OUTPUT_SET|GPIO_PORTF|GPIO_PIN1)
+#define GPIO_I2C2_SDA_GPIO (GPIO_OUTPUT|GPIO_OPENDRAIN|GPIO_SPEED_50MHz|GPIO_OUTPUT_SET|GPIO_PORTF|GPIO_PIN0)
 
 /* SPI
  *
@@ -322,10 +305,6 @@
 # define PROBE(n,s)
 # define PROBE_MARK(n)
 #endif
-
-// DMA for USART
-
-#define DMAMAP_USART1_RX DMAMAP_USART1_RX_1
 
 
 #endif  /* __ARCH_BOARD_BOARD_H */

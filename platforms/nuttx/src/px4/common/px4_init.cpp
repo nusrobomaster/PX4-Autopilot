@@ -48,6 +48,8 @@
 int px4_platform_init(void)
 {
 
+	syslog(LOG_INFO, "px4_platform_init\n");
+
 #if defined(CONFIG_HAVE_CXX) && defined(CONFIG_HAVE_CXXINITIALIZE)
 	/* run C++ ctors before we go any further */
 	up_cxxinitialize();
@@ -110,17 +112,21 @@ int px4_platform_init(void)
 		// keep stderr(2) untouched: the buffered console will use it to output to the original console
 		close(fd_buf);
 	}
-
+	syslog(LOG_INFO, "hrt_init\n");
 	hrt_init();
-
+	syslog(LOG_INFO, "param_init\n");
 	param_init();
+	syslog(LOG_INFO, "param_init done\n");
 
 	/* configure CPU load estimation */
 #ifdef CONFIG_SCHED_INSTRUMENTATION
+	syslog(LOG_INFO, "cpuload_initialize_once\n");
 	cpuload_initialize_once();
 #endif
-
+	syslog(LOG_INFO, "WorkQueueManagerStart\n");
 	px4::WorkQueueManagerStart();
+
+	syslog(LOG_INFO, "px4_platform_init done\n");
 
 	return PX4_OK;
 }

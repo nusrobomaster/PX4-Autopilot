@@ -43,6 +43,7 @@ ToneAlarm::ToneAlarm() :
 	CDev(TONE_ALARM0_DEVICE_PATH),
 	ScheduledWorkItem(MODULE_NAME, px4::wq_configurations::hp_default)
 {
+	PX4_DEBUG("ToneAlarm constructor done");
 }
 
 ToneAlarm::~ToneAlarm()
@@ -58,9 +59,12 @@ ToneAlarm::~ToneAlarm()
 
 int ToneAlarm::init()
 {
+	PX4_INFO("ToneAlarm init()");
 	if (CDev::init() != OK) {
 		return PX4_ERROR;
 	}
+
+	PX4_INFO("ToneAlarm init() completes CDev::init()");
 
 	// NOTE: Implement hardware specific detail in the ToneAlarmInterface class implementation.
 	ToneAlarmInterface::init();
@@ -68,6 +72,8 @@ int ToneAlarm::init()
 	_running = true;
 
 	ScheduleNow();
+
+	PX4_INFO("ToneAlarm init() done.");
 
 	return OK;
 }
@@ -188,8 +194,9 @@ extern "C" __EXPORT int tone_alarm_main(int argc, char *argv[])
 
 		if (!strcmp(argv1, "start")) {
 			if (g_dev == nullptr) {
+				PX4_INFO("creating new ToneAlarm()");
 				g_dev = new ToneAlarm();
-
+				PX4_INFO("Done creating new ToneAlarm()");
 				if (g_dev == nullptr) {
 					PX4_ERR("could not allocate the driver.");
 				}

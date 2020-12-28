@@ -105,18 +105,18 @@ __END_DECLS
  ************************************************************************************/
 __EXPORT void board_peripheral_reset(int ms)
 {
-	/* set the peripheral rails off */
-	stm32_configgpio(GPIO_VDD_5V_PERIPH_EN);
-	stm32_gpiowrite(GPIO_VDD_5V_PERIPH_EN, 1);
+	// /* set the peripheral rails off */
+	// stm32_configgpio(GPIO_VDD_5V_PERIPH_EN);
+	// stm32_gpiowrite(GPIO_VDD_5V_PERIPH_EN, 1);
 
-	/* wait for the peripheral rail to reach GND */
-	usleep(ms * 1000);
-	syslog(LOG_DEBUG, "reset done, %d ms\n", ms);
+	// /* wait for the peripheral rail to reach GND */
+	// usleep(ms * 1000);
+	// syslog(LOG_DEBUG, "reset done, %d ms\n", ms);
 
-	/* re-enable power */
+	// /* re-enable power */
 
-	/* switch the peripheral rail back on */
-	stm32_gpiowrite(GPIO_VDD_5V_PERIPH_EN, 0);
+	// /* switch the peripheral rail back on */
+	// stm32_gpiowrite(GPIO_VDD_5V_PERIPH_EN, 0);
 }
 
 /************************************************************************************
@@ -297,22 +297,22 @@ stm32_boardinitialize(void)
 
 	/* configure ADC pins */
 
-	stm32_configgpio(GPIO_ADC1_IN2);	/* BATT_VOLTAGE_SENS */
-	stm32_configgpio(GPIO_ADC1_IN3);	/* BATT_CURRENT_SENS */
-	stm32_configgpio(GPIO_ADC1_IN4);	/* VDD_5V_SENS */
-	stm32_configgpio(GPIO_ADC1_IN13);	/* FMU_AUX_ADC_1 */
-	stm32_configgpio(GPIO_ADC1_IN14);	/* FMU_AUX_ADC_2 */
-	stm32_configgpio(GPIO_ADC1_IN15);	/* PRESSURE_SENS */
+	// stm32_configgpio(GPIO_ADC1_IN2);	/* BATT_VOLTAGE_SENS */
+	// stm32_configgpio(GPIO_ADC1_IN3);	/* BATT_CURRENT_SENS */
+	// stm32_configgpio(GPIO_ADC1_IN4);	/* VDD_5V_SENS */
+	// stm32_configgpio(GPIO_ADC1_IN13);	/* FMU_AUX_ADC_1 */
+	// stm32_configgpio(GPIO_ADC1_IN14);	/* FMU_AUX_ADC_2 */
+	// stm32_configgpio(GPIO_ADC1_IN15);	/* PRESSURE_SENS */
 
 	/* configure power supply control/sense pins */
-	stm32_configgpio(GPIO_VDD_5V_PERIPH_EN);
+	// stm32_configgpio(GPIO_VDD_5V_PERIPH_EN);
 	board_control_spi_sensors_power_configgpio();
 	board_control_spi_sensors_power(true, 0xffff);
-	stm32_configgpio(GPIO_VDD_BRICK_VALID);
-	stm32_configgpio(GPIO_VDD_SERVO_VALID);
-	stm32_configgpio(GPIO_VDD_USB_VALID);
-	stm32_configgpio(GPIO_VDD_5V_HIPOWER_OC);
-	stm32_configgpio(GPIO_VDD_5V_PERIPH_OC);
+	// stm32_configgpio(GPIO_VDD_BRICK_VALID);
+	// stm32_configgpio(GPIO_VDD_SERVO_VALID);
+	// stm32_configgpio(GPIO_VDD_USB_VALID);
+	// stm32_configgpio(GPIO_VDD_5V_HIPOWER_OC);
+	// stm32_configgpio(GPIO_VDD_5V_PERIPH_OC);
 
 	/*
 	 * CAN GPIO config.
@@ -361,13 +361,17 @@ __EXPORT int board_app_initialize(uintptr_t arg)
 	/* Ensure the power is on 1 ms before we drive the GPIO pins */
 	usleep(1000);
 
+	syslog(LOG_INFO, "board_app_initialize\n");
+
 	/* configure SPI interfaces (after the hw is determined) */
 	stm32_spiinitialize();
 
+	syslog(LOG_INFO, "px4_platform_init\n");
 	px4_platform_init();
 
 	/* configure the DMA allocator */
 
+	syslog(LOG_INFO, "board_dma_alloc_init\n");
 	if (board_dma_alloc_init() < 0) {
 		syslog(LOG_ERR, "DMA alloc FAILED\n");
 	}
@@ -393,9 +397,11 @@ __EXPORT int board_app_initialize(uintptr_t arg)
 	drv_led_start();
 	led_off(LED_AMBER);
 
-	if (board_hardfault_init(2, true) != 0) {
-		led_on(LED_AMBER);
-	}
+	usleep(100000);
+
+	// if (board_hardfault_init(2, true) != 0) {
+	// 	led_on(LED_AMBER);
+	// }
 
 	/* Configure SPI-based devices */
 

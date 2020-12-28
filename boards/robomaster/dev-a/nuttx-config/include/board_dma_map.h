@@ -48,7 +48,7 @@
 |            |   TIM5_UP_1      |   TIM5_TRIG_1    |                  |   TIM5_TRIG_2    |                  |                  |                  |                  |
 | Channel 7  | -                | TIM6_UP          | I2C2_RX          | I2C2_RX_1        | USART3_TX_2      | DAC1             | DAC2             | I2C2_TX          |
 |            |                  |                  |                  |                  |                  |                  |                  |                  |
-| Usage      |                  | USART3_RX        | UART4_RX         | UART7_RX         | USART3_TX_2      | USART2_RX        | TIM4_UP          |                  |
+| Usage      | UART8_TX         | UART7_TX         | I2C2_RX          | UART7_RX         |                  |                  | UART8_RX         | I2C2_TX          |
 
 
 |    DMA2    | Stream 0         | Stream 1         | Stream 2         | Stream 3         | Stream 4         | Stream 5         | Stream 6         | Stream 7         |
@@ -68,26 +68,27 @@
 |            |                  |                  |                  |                  |                  |                  |                  |   TIM8_TRIG      |
 |            |                  |                  |                  |                  |                  |                  |                  |   TIM8_COM       |
 |            |                  |                  |                  |                  |                  |                  |                  |                  |
-| Usage      | SPI4_RX_1        | USART6_RX_1      | SPI1_RX_2        | SPI1_TX_1        | SPI4_TX_2        | TIM1_UP          | SDIO             | USART6_TX_2      |
+| Usage      | SPI4_RX_1        | SPI4_TX_1        | USART6_RX_2      | SPI5_RX_1        | SPI5_TX_1        | USART1_RX_2      | SDIO             | USART6_TX_2      |
  */
 
 // DMA1 Channel/Stream Selections
 //--------------------------------------------//---------------------------//----------------
-//      DMAMAP_USART3_RX                      // DMA1, Stream 1, Channel 4
-//      DMAMAP_UART4_RX                       // DMA1, Stream 2, Channel 4
-//      DMAMAP_UART7_RX                       // DMA1, Stream 3, Channel 5
-// #define DMAMAP_USART3_TX  DMAMAP_USART3_TX_2  // DMA1, Stream 4, Channel 7    (TELEM2 TX)
-//      DMAMAP_USART2_RX                      // DMA1, Stream 5, Channel 4
-//      DMAMAP_TIM4_UP                        // DMA1, Stream 6, Channel 2    (DSHOT)
+
+// DMAMAP_UART8_TX
+// DMAMAP_UART7_TX
+// DMAMAP_UART7_RX
+// DMAMAP_UART8_RX
+#define DMAMAP_I2C2_RX DMAMAP_I2C2_RX_1
+// DMAMAP_I2C2_TX
 
 
 //  DMA2 Channel/Stream Selections
 //--------------------------------------------//---------------------------//----------------
-// #define DMACHAN_SPI4_RX    DMAMAP_SPI4_RX_1   // DMA2, Stream 0, Channel 4    (SPI4 sensors RX)
-#define DMAMAP_USART6_RX   DMAMAP_USART6_RX_1 // DMA2, Stream 1, Channel 4    (PX4IO RX)
-// #define DMACHAN_SPI1_RX    DMAMAP_SPI1_RX_2   // DMA2, Stream 2, Channel 3    (SPI1 sensors RX)
-// #define DMACHAN_SPI1_TX    DMAMAP_SPI1_TX_1   // DMA2, Stream 3, Channel 3    (SPI1 sensors TX)
-// #define DMACHAN_SPI4_TX    DMAMAP_SPI4_TX_2   // DMA2, Stream 4, Channel 5    (SPI4 sensors TX)
-// //      DMAMAP_TIM1_UP                        // DMA2, Stream 5, Channel 6    (DSHOT)
-// #define DMAMAP_SDIO        DMAMAP_SDIO_2      // DMA2, Stream 6, Channel 4
+#define DMACHAN_SPI4_RX    DMAMAP_SPI4_RX_1
+#define DMAMAP_USART6_RX   DMAMAP_USART6_RX_2
+#define DMACHAN_SPI4_TX    DMAMAP_SPI4_TX_1
+#define DMAMAP_SDIO        DMAMAP_SDIO_2      // DMA2, Stream 6, Channel 4
 #define DMAMAP_USART6_TX   DMAMAP_USART6_TX_2 // DMA2, Stream 7, Channel 5    (PX4IO TX)
+#define DMACHAN_SPI5_RX    DMAMAP_SPI5_RX_1
+#define DMACHAN_SPI5_TX    DMAMAP_SPI5_TX_1
+#define DMAMAP_USART1_RX DMAMAP_USART1_RX_2

@@ -65,6 +65,7 @@ static px4::atomic_bool _wq_manager_should_exit{true};
 static WorkQueue *
 FindWorkQueueByName(const char *name)
 {
+	PX4_DEBUG("FindWorkQueueByName");
 	if (_wq_manager_wqs_list == nullptr) {
 		PX4_ERR("not running");
 		return nullptr;
@@ -85,6 +86,7 @@ FindWorkQueueByName(const char *name)
 WorkQueue *
 WorkQueueFindOrCreate(const wq_config_t &new_wq)
 {
+	PX4_DEBUG("WorkQueueFindOrCreate");
 	if (_wq_manager_create_queue == nullptr) {
 		PX4_ERR("not running");
 		return nullptr;
@@ -105,6 +107,7 @@ WorkQueueFindOrCreate(const wq_config_t &new_wq)
 		while (wq == nullptr && t < 10_s) {
 			// Wait up to 10 seconds, checking every 1 ms
 			t += 1_ms;
+			PX4_DEBUG("px4_usleep 1ms");
 			px4_usleep(1_ms);
 
 			wq = FindWorkQueueByName(new_wq.name);
@@ -114,6 +117,8 @@ WorkQueueFindOrCreate(const wq_config_t &new_wq)
 			PX4_ERR("failed to create %s", new_wq.name);
 		}
 	}
+
+	PX4_DEBUG("WorkQueueFindOrCreate END");
 
 	return wq;
 }
@@ -207,13 +212,17 @@ WorkQueueRunner(void *context)
 	wq_config_t *config = static_cast<wq_config_t *>(context);
 	WorkQueue wq(*config);
 
+	PX4_DEBUG("_wq_manager_wqs_list->add");
 	// add to work queue list
 	_wq_manager_wqs_list->add(&wq);
 
+	PX4_DEBUG("wq.Run()");
 	wq.Run();
 
 	// remove from work queue list
 	_wq_manager_wqs_list->remove(&wq);
+
+	PX4_DEBUG("WorkQueueRunner done");
 
 	return nullptr;
 }
@@ -286,12 +295,16 @@ WorkQueueManagerRun(int, char **)
 			pthread_t thread;
 			int ret_create = pthread_create(&thread, &attr, WorkQueueRunner, (void *)wq);
 
+			syslog(LOG_INFO, "%s\n", wq->name);
+
 			if (ret_create == 0) {
 				PX4_DEBUG("starting: %s, priority: %d, stack: %zu bytes", wq->name, param.sched_priority, stacksize);
 
 			} else {
 				PX4_ERR("failed to create thread for %s (%i): %s", wq->name, ret_create, strerror(ret_create));
 			}
+
+			syslog(LOG_INFO, "pthread_attr_destroy\n");
 
 			// destroy thread attributes
 			int ret_destroy = pthread_attr_destroy(&attr);
@@ -301,6 +314,8 @@ WorkQueueManagerRun(int, char **)
 			}
 		}
 	}
+
+	syslog(LOG_INFO, "WorkQueueManagerRun done\n");
 
 	return 0;
 }

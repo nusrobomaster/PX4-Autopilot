@@ -45,6 +45,7 @@ namespace px4
 WorkItem::WorkItem(const char *name, const wq_config_t &config) :
 	_item_name(name)
 {
+	PX4_DEBUG("WorkItem::WorkItem");
 	if (!Init(config)) {
 		PX4_ERR("init failed");
 	}
@@ -68,13 +69,18 @@ WorkItem::~WorkItem()
 bool WorkItem::Init(const wq_config_t &config)
 {
 	// clear any existing first
+	PX4_DEBUG("Deinit");
 	Deinit();
 
+	PX4_DEBUG("WorkQueueFindOrCreate");
 	px4::WorkQueue *wq = WorkQueueFindOrCreate(config);
 
+
+	PX4_DEBUG("Attach");
 	if ((wq != nullptr) && wq->Attach(this)) {
 		_wq = wq;
 		_time_first_run = 0;
+		PX4_DEBUG("Init Done");
 		return true;
 	}
 
