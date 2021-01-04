@@ -339,9 +339,4 @@
 # define PROBE_MARK(n)
 #endif
 
-// DMA for USART
-
-#define DMAMAP_USART1_RX DMAMAP_USART1_RX_1
-
-
 #endif  /* __ARCH_BOARD_BOARD_H */
