@@ -362,12 +362,18 @@ void RCInput::Run()
 				// Configure serial port for SBUS
 				sbus_config(_rcs_fd, board_rc_singlewire(_device));
 				rc_io_invert(true);
+				syslog(LOG_INFO,"newBytes = %d\n", newBytes);
 
 			} else if (_rc_scan_locked
 				   || cycle_timestamp - _rc_scan_begin < rc_scan_max) {
 
 				// parse new data
 				if (newBytes > 0) {
+					syslog(LOG_INFO,"try parsing newBytes = %d\n", newBytes);
+
+					for(int i=0; i<newBytes; i++)
+						syslog(LOG_INFO,"%x ", _rcs_buf[i]);
+					syslog(LOG_INFO,"\n");
 					rc_updated = sbus_parse(cycle_timestamp, &_rcs_buf[0], newBytes, &_raw_rc_values[0], &_raw_rc_count, &sbus_failsafe,
 								&sbus_frame_drop, &frame_drops, input_rc_s::RC_INPUT_MAX_CHANNELS);
 
