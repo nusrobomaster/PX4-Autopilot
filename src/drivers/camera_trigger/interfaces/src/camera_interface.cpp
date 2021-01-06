@@ -15,7 +15,7 @@ CameraInterface::CameraInterface():
 void CameraInterface::get_pins()
 {
 
-	// Get parameter handle
+	// Get parameter handle. TRIG_PINS is defined as 56 in camera_trigger_param.c
 	_p_pin = param_find("TRIG_PINS");
 
 	if (_p_pin == PARAM_INVALID) {
