@@ -378,7 +378,13 @@ void RCInput::Run()
 					rc_updated = dbus_parse(cycle_timestamp, &_rcs_buf[0], newBytes, &_raw_rc_values[0], &_raw_rc_count, &sbus_failsafe,
 								&sbus_frame_drop, &frame_drops, input_rc_s::RC_INPUT_MAX_CHANNELS);
 
+
 					if (rc_updated) {
+						//syslog(LOG_INFO,"try parsing newBytes = %d\n", newBytes);
+					        //for(int i=0; i<18; i++)
+					        //       syslog(LOG_INFO,"%x ", _raw_rc_values[i]);
+					        //syslog(LOG_INFO,"\n");
+
 						// we have a new SBUS frame. Publish it.
 						_rc_in.input_source = input_rc_s::RC_INPUT_SOURCE_PX4FMU_SBUS;
 						fill_rc_in(_raw_rc_count, _raw_rc_values, cycle_timestamp,
