@@ -43,6 +43,7 @@
 #include <lib/rc/crsf.h>
 #include <lib/rc/dsm.h>
 #include <lib/rc/sbus.h>
+#include <lib/rc/dbus.h>
 #include <lib/rc/st24.h>
 #include <lib/rc/sumd.h>
 #include <px4_platform_common/px4_config.h>

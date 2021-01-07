@@ -369,16 +369,28 @@ void RCInput::Run()
 
 				// DBUS has 18 bytes per frame
 				if (newBytes > 0) {
-					syslog(LOG_INFO,"try parsing newBytes = %d\n", newBytes);
-					for(int i=0; i<newBytes; i++)
-						syslog(LOG_INFO,"%x ", _rcs_buf[i]);
-					syslog(LOG_INFO,"\n");
+					// syslog(LOG_INFO,"try parsing newBytes = %d\n", newBytes);
+					// for(int i=0; i<newBytes; i++)
+					// 	syslog(LOG_INFO,"%x ", _rcs_buf[i]);
+					// syslog(LOG_INFO,"\n");
 
-					if (newBytes == 18){
-						rc_updated = cycle_timestamp;
-						_rc_in.timestamp_last_signal = cycle_timestamp;
+
+					rc_updated = dbus_parse(cycle_timestamp, &_rcs_buf[0], newBytes, &_raw_rc_values[0], &_raw_rc_count, &sbus_failsafe,
+								&sbus_frame_drop, &frame_drops, input_rc_s::RC_INPUT_MAX_CHANNELS);
+
+					if (rc_updated) {
+						// we have a new SBUS frame. Publish it.
+						_rc_in.input_source = input_rc_s::RC_INPUT_SOURCE_PX4FMU_SBUS;
+						fill_rc_in(_raw_rc_count, _raw_rc_values, cycle_timestamp,
+							   sbus_frame_drop, sbus_failsafe, frame_drops);
 						_rc_scan_locked = true;
 					}
+
+					// if (newBytes == 18){
+					// 	rc_updated = cycle_timestamp;
+					// 	_rc_in.timestamp_last_signal = cycle_timestamp;
+					// 	_rc_scan_locked = true;
+					// }
 
 				}
 
