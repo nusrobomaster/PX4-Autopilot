@@ -113,17 +113,17 @@ __END_DECLS
 __EXPORT void board_peripheral_reset(int ms)
 {
 	/* set the peripheral rails off */
-	stm32_configgpio(GPIO_VDD_5V_PERIPH_EN);
-	stm32_gpiowrite(GPIO_VDD_5V_PERIPH_EN, 1);
+	// stm32_configgpio(GPIO_VDD_5V_PERIPH_EN);
+	// stm32_gpiowrite(GPIO_VDD_5V_PERIPH_EN, 1);
 
-	/* wait for the peripheral rail to reach GND */
-	usleep(ms * 1000);
-	syslog(LOG_DEBUG, "reset done, %d ms\n", ms);
+	// /* wait for the peripheral rail to reach GND */
+	// usleep(ms * 1000);
+	// syslog(LOG_DEBUG, "reset done, %d ms\n", ms);
 
-	/* re-enable power */
+	// /* re-enable power */
 
-	/* switch the peripheral rail back on */
-	stm32_gpiowrite(GPIO_VDD_5V_PERIPH_EN, 0);
+	// /* switch the peripheral rail back on */
+	// stm32_gpiowrite(GPIO_VDD_5V_PERIPH_EN, 0);
 }
 
 /************************************************************************************
