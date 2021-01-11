@@ -32,14 +32,33 @@
  ****************************************************************************/
 
 #include "move_motor.h"
+// #include "modules/rover_pos_control/RoverPositionControl.hpp"
+// #include "drivers/pwm_out/PWMOut.hpp"
 
+#include <parameters/param.h>
+#include <px4_platform_common/module.h>
+#include <px4_platform_common/module_params.h>
 #include <px4_platform_common/getopt.h>
 #include <px4_platform_common/log.h>
 #include <px4_platform_common/posix.h>
 
+#include <unistd.h>
+#include <stdio.h>
+#include <poll.h>
+#include <string.h>
+#include <math.h>
+#include <sys/ioctl.h>
+
+#include <uORB/uORB.h>
+#include <uORB/Subscription.hpp>
 #include <uORB/topics/parameter_update.h>
 #include <uORB/topics/sensor_combined.h>
-
+// #include <uORB/topics/actuator_controls.h>
+#include <uORB/Publication.hpp>
+#include <uORB/topics/pwm_input.h>
+// #include <uORB/topics/manual_control_setpoint.h>
+#include <drivers/drv_hrt.h>
+// #include <drivers/drv_pwm_output.h>
 
 int Module::print_status()
 {
@@ -64,7 +83,7 @@ int Module::custom_command(int argc, char *argv[])
 	}
 	 */
 
-	return print_usage("unknown command");
+	return print_usage("unknown command"); // custom function, not the printf statement
 }
 
 
@@ -139,13 +158,37 @@ void Module::run()
 {
 	// Example: run the loop synchronized to the sensor_combined topic publication
 	int sensor_combined_sub = orb_subscribe(ORB_ID(sensor_combined));
+	/* limit the update rate to 5 Hz */
+	orb_set_interval(sensor_combined_sub, 1000);
 
-	px4_pollfd_struct_t fds[1];
+	//creating struct for pwm before advertising
+	struct pwm_input_s pwm = {};
+	// advertising the pwm topic
+	orb_advert_t pwm_pub = orb_advertise(ORB_ID(pwm_input), &pwm);
+	//subscribing to the pwm_input topic on the loop
+	int pwm_input_sub = orb_subscribe(ORB_ID(pwm_input));
+	orb_set_interval(pwm_input_sub, 1000);
+
+	//trying out actuator_controls
+	// struct actuator_controls_s act_controls = {}; 
+	// orb_advert_t _actuator_controls_pub = orb_advertise(ORB_ID(actuator_controls_0), &act_controls);
+
+	//manual control
+	// struct manual_control_setpoint_s _manual_control_setpoint{};	
+	// int mc_sub = orb_subscribe(ORB_ID(manual_control_setpoint));
+	// orb_advert_t _mc_pub = orb_advertise(ORB_ID(manual_control_setpoint), &_manual_control_setpoint);
+
+
+	px4_pollfd_struct_t fds[2]; // later change this to 2 so that they can subscribe to more polls
 	fds[0].fd = sensor_combined_sub;
 	fds[0].events = POLLIN;
+	fds[1].fd = pwm_input_sub;
+	fds[1].events = POLLIN; 
 
 	// initialize parameters
 	parameters_update(true);
+
+	int decay = 2000;
 
 	while (!should_exit()) {
 
@@ -166,6 +209,34 @@ void Module::run()
 			struct sensor_combined_s sensor_combined;
 			orb_copy(ORB_ID(sensor_combined), sensor_combined_sub, &sensor_combined);
 			// TODO: do something with the data...
+
+				PX4_INFO("Orginal Value: %d", decay);
+				if(decay<1000){
+					PX4_INFO("The decay has stopped for the gimbal.");
+					break;
+				}
+				decay -= 50; 
+				PX4_INFO("New Value: %d", decay);
+				// act_controls.timestamp = hrt_absolute_time();
+				// act_controls.control[0] = 2000;
+				// act_controls.control[1] = 2000;
+				// act_controls.control[2] = 2000;
+				// act_controls.control[3] = 2000;
+				// act_controls.control[4] = 2000;
+				// act_controls.control[5] = 2000;
+				// act_controls.control[6] = 2000;
+				// act_controls.control[7] = 2000;
+				// _manual_control_setpoint.timestamp = hrt_absolute_time();
+				// _manual_control_setpoint.x = decay;
+				// _manual_control_setpoint.y = decay;
+				// _manual_control_setpoint.z = decay;
+				// _manual_control_setpoint.r = decay;
+				pwm.timestamp = hrt_absolute_time();
+				pwm.pulse_width = decay;
+				pwm.period = 200;
+				orb_publish(ORB_ID(pwm_input), pwm_pub, &pwm);
+				// orb_publish(ORB_ID(actuator_controls_0), _actuator_controls_pub, &act_controls);
+				// orb_publish(ORB_ID(manual_control_setpoint), _mc_pub, &_manual_control_setpoint);
 
 		}
 

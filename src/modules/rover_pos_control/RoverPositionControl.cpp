@@ -74,7 +74,7 @@ void RoverPositionControl::parameters_update(bool force)
 	if (_parameter_update_sub.updated() || force) {
 		// clear update
 		parameter_update_s pupdate;
-		_parameter_update_sub.copy(&pupdate);
+		_parameter_update_sub.copy(&pupdate); // copy the struct we are updating
 
 		// update parameters from storage
 		updateParams();
@@ -85,7 +85,7 @@ void RoverPositionControl::parameters_update(bool force)
 
 		pid_init(&_speed_ctrl, PID_MODE_DERIVATIV_CALC, 0.01f);
 		pid_set_parameters(&_speed_ctrl,
-				   _param_speed_p.get(),
+				   _param_speed_p.get(), // here the parameter values can be updated in QgroundControl
 				   _param_speed_i.get(),
 				   _param_speed_d.get(),
 				   _param_speed_imax.get(),
@@ -97,7 +97,7 @@ void
 RoverPositionControl::vehicle_control_mode_poll()
 {
 	bool updated;
-	orb_check(_control_mode_sub, &updated);
+	orb_check(_control_mode_sub, &updated); //not sure what this does?
 
 	if (updated) {
 		orb_copy(ORB_ID(vehicle_control_mode), _control_mode_sub, &_control_mode);
@@ -172,7 +172,7 @@ RoverPositionControl::control_position(const matrix::Vector2f &current_position,
 		//bool was_circle_mode = _gnd_control.circle_mode();
 
 		/* current waypoint (the one currently heading for) */
-		matrix::Vector2f curr_wp((float)pos_sp_triplet.current.lat, (float)pos_sp_triplet.current.lon);
+		matrix::Vector2f curr_wp((float)pos_sp_triplet.current.lat, (float)pos_sp_triplet.current.lon); // this is a constructor assignment
 
 		/* previous waypoint */
 		matrix::Vector2f prev_wp = curr_wp;
@@ -184,7 +184,7 @@ RoverPositionControl::control_position(const matrix::Vector2f &current_position,
 
 		matrix::Vector2f ground_speed_2d(ground_speed);
 
-		float mission_throttle = _param_throttle_cruise.get();
+		float mission_throttle = _param_throttle_cruise.get(); // you can get the parameter values using the get method, it is a template func.
 
 		/* Just control the throttle */
 		if (_param_speed_control_mode.get() == 1) {
@@ -208,7 +208,7 @@ RoverPositionControl::control_position(const matrix::Vector2f &current_position,
 			mission_throttle = _param_throttle_speed_scaler.get()
 					   * pid_calculate(&_speed_ctrl, mission_target_speed, x_vel, x_acc, dt);
 
-			// Constrain throttle between min and max
+			// Constrain throttle between min and max, values set in QgroundControl
 			mission_throttle = math::constrain(mission_throttle, _param_throttle_min.get(), _param_throttle_max.get());
 
 		} else {
@@ -330,6 +330,7 @@ RoverPositionControl::control_velocity(const matrix::Vector3f &current_velocity,
 
 void
 RoverPositionControl::control_attitude(const vehicle_attitude_s &att, const vehicle_attitude_setpoint_s &att_sp)
+//this function is so that the bot only rotates, but maybe with a little translational movement
 {
 	// quaternion attitude control law, qe is rotation from q to qd
 	const Quatf qe = Quatf(att.q).inversed() * Quatf(att_sp.q_d);
@@ -374,7 +375,7 @@ RoverPositionControl::run()
 	/* Setup of loop */
 	fds[0].fd = _global_pos_sub;
 	fds[0].events = POLLIN;
-	fds[1].fd = _manual_control_setpoint_sub;
+	fds[1].fd = _manual_control_setpoint_sub; // ideally going for this, unless autonomous
 	fds[1].events = POLLIN;
 	fds[2].fd = _sensor_combined_sub;
 	fds[2].events = POLLIN;
@@ -501,7 +502,8 @@ RoverPositionControl::run()
 				//PX4_INFO("Manual mode!");
 				_act_controls.control[actuator_controls_s::INDEX_ROLL] = _manual_control_setpoint.y;
 				_act_controls.control[actuator_controls_s::INDEX_PITCH] = -_manual_control_setpoint.x;
-				_act_controls.control[actuator_controls_s::INDEX_YAW] = _manual_control_setpoint.r; //TODO: Readd yaw scale param
+				_act_controls.control[actuator_controls_s::INDEX_YAW] = _manual_control_setpoint.r; //TODO: Readd yaw scale param, i guess
+				// must do this
 				_act_controls.control[actuator_controls_s::INDEX_THROTTLE] = _manual_control_setpoint.z;
 			}
 		}
@@ -519,7 +521,13 @@ RoverPositionControl::run()
 			    _control_mode.flag_control_position_enabled ||
 			    manual_mode) {
 				/* publish the actuator controls */
-				_actuator_controls_pub.publish(_act_controls);
+				_act_controls.control[actuator_controls_s::GROUP_INDEX_GIMBAL] = 2000;
+				_act_controls.control[actuator_controls_s::INDEX_ROLL] = 1000;
+				_act_controls.control[actuator_controls_s::INDEX_PITCH] = -1000;
+				_act_controls.control[actuator_controls_s::INDEX_YAW] = 1000;
+				// must do this
+				_act_controls.control[actuator_controls_s::INDEX_THROTTLE] = 2000;
+				_actuator_controls_pub.publish(_act_controls); // the final line that will publish the message
 			}
 		}
 

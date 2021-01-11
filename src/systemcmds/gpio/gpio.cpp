@@ -170,6 +170,7 @@ extern "C" __EXPORT int gpio_main(int argc, char *argv[])
 
 		px4_arch_configgpio(mask);
 		px4_arch_gpiowrite(mask, value);
+		PX4_INFO("Mask is: %d", mask);
 		printf("OK\n");
 	}
 

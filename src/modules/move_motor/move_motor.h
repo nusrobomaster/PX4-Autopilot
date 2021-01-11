@@ -33,10 +33,25 @@
 
 #pragma once
 
+#include <parameters/param.h>
 #include <px4_platform_common/module.h>
 #include <px4_platform_common/module_params.h>
+#include <px4_platform_common/getopt.h>
+#include <px4_platform_common/log.h>
+#include <px4_platform_common/posix.h>
+
+#include <unistd.h>
+#include <stdio.h>
+#include <poll.h>
+#include <string.h>
+#include <math.h>
+
+#include <uORB/uORB.h>
 #include <uORB/Subscription.hpp>
 #include <uORB/topics/parameter_update.h>
+#include <uORB/topics/sensor_combined.h>
+#include <uORB/Publication.hpp>
+#include <uORB/topics/pwm_input.h>
 
 extern "C" __EXPORT int move_motor_main(int argc, char *argv[]);
 

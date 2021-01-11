@@ -69,7 +69,7 @@ int PWMOut::init()
 
 	/* try to claim the generic PWM output device node as well - it's OK if we fail at this */
 	_class_instance = register_class_devname(PWM_OUTPUT_BASE_DEVICE_PATH);
-
+	PX4_INFO("Here 1");
 	if (_class_instance == CLASS_DEVICE_PRIMARY) {
 		/* lets not be too verbose */
 	} else if (_class_instance < 0) {
@@ -103,6 +103,7 @@ int PWMOut::set_mode(Mode mode)
 	switch (mode) {
 	case MODE_1PWM:
 		/* default output rates */
+		PX4_INFO("Here 2");
 		_pwm_default_rate = 50;
 		_pwm_alt_rate = 50;
 		_pwm_alt_rate_channels = 0;
@@ -125,6 +126,7 @@ int PWMOut::set_mode(Mode mode)
 		PX4_DEBUG("MODE_2PWM");
 
 		/* default output rates */
+		PX4_INFO("Here 3");
 		_pwm_default_rate = 50;
 		_pwm_alt_rate = 50;
 		_pwm_alt_rate_channels = 0;
@@ -505,7 +507,7 @@ void PWMOut::update_pwm_trims()
 int PWMOut::task_spawn(int argc, char *argv[])
 {
 	PWMOut *instance = new PWMOut();
-
+	PX4_INFO("Here 4");
 	if (instance) {
 		_object.store(instance);
 		_task_id = task_id_is_work_queue;
@@ -542,10 +544,10 @@ void PWMOut::update_pwm_out_state(bool on)
 {
 	if (on && !_pwm_initialized && _pwm_mask != 0) {
 		up_pwm_servo_init(_pwm_mask);
+		PX4_INFO("Here update_pwm_out_state");
 		set_pwm_rate(_pwm_alt_rate_channels, _pwm_default_rate, _pwm_alt_rate);
 		_pwm_initialized = true;
 	}
-
 	up_pwm_servo_arm(on);
 }
 
@@ -558,6 +560,7 @@ bool PWMOut::updateOutputs(bool stop_motors, uint16_t outputs[MAX_ACTUATORS],
 
 	/* output to the servos */
 	if (_pwm_initialized) {
+		PX4_INFO("Here updateOutputs.");
 		for (size_t i = 0; i < math::min(_num_outputs, num_outputs); i++) {
 			up_pwm_servo_set(i, outputs[i]);
 		}
@@ -1898,7 +1901,7 @@ int PWMOut::custom_command(int argc, char *argv[])
 
 	} else if (!strcmp(verb, "mode_pwm")) {
 		new_mode = PORT_FULL_PWM;
-
+		PX4_INFO("new mode: %d",new_mode);
 		// mode: defines which outputs to drive (others may be used by other tasks such as camera capture)
 #if defined(BOARD_HAS_PWM)
 

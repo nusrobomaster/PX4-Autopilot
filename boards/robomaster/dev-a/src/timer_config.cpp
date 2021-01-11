@@ -39,6 +39,7 @@ constexpr io_timers_t io_timers[MAX_IO_TIMERS] = {
 };
 
 constexpr timer_io_channels_t timer_io_channels[MAX_TIMER_IO_CHANNELS] = {
+	// so this is in chronological order of the schematic diagram, 1 to 8, each channel is the pin in that sense.
 	initIOTimerChannelOutputClear(io_timers, {Timer::Timer2, Timer::Channel1}, {GPIO::PortA, GPIO::Pin0}),
 	initIOTimerChannelOutputClear(io_timers, {Timer::Timer2, Timer::Channel2}, {GPIO::PortA, GPIO::Pin1}),
 	initIOTimerChannelOutputClear(io_timers, {Timer::Timer2, Timer::Channel3}, {GPIO::PortA, GPIO::Pin2}),

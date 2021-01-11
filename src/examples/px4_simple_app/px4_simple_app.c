@@ -50,6 +50,7 @@
 #include <uORB/uORB.h>
 #include <uORB/topics/sensor_combined.h>
 #include <uORB/topics/vehicle_attitude.h>
+#include <uORB/topics/pwm_input.h>
 
 __EXPORT int px4_simple_app_main(int argc, char *argv[]);
 
@@ -59,6 +60,7 @@ int px4_simple_app_main(int argc, char *argv[])
 
 	/* subscribe to sensor_combined topic */
 	int sensor_sub_fd = orb_subscribe(ORB_ID(sensor_combined));
+	// int pwm_sub_fd =  orb_subscribe(ORB_ID(pwm_input));
 	/* limit the update rate to 5 Hz */
 	orb_set_interval(sensor_sub_fd, 200);
 
@@ -66,6 +68,11 @@ int px4_simple_app_main(int argc, char *argv[])
 	struct vehicle_attitude_s att;
 	memset(&att, 0, sizeof(att));
 	orb_advert_t att_pub = orb_advertise(ORB_ID(vehicle_attitude), &att);
+
+	/* advertise pwm topic*/
+	struct pwm_input_s pwm;
+	memset(&pwm, 0, sizeof(pwm)); // pointer to the block of memory to fill, value to give it, the size required
+	orb_advert_t pwm_pub =  orb_advertise(ORB_ID(pwm_input), &pwm);
 
 	/* one could wait for multiple topics with this technique, just using one here */
 	px4_pollfd_struct_t fds[] = {
@@ -114,7 +121,10 @@ int px4_simple_app_main(int argc, char *argv[])
 				att.q[1] = raw.accelerometer_m_s2[1];
 				att.q[2] = raw.accelerometer_m_s2[2];
 
+				pwm.pulse_width = raw.accelerometer_m_s2[2];
+
 				orb_publish(ORB_ID(vehicle_attitude), att_pub, &att);
+				orb_publish(ORB_ID(pwm_input),pwm_pub, &pwm);
 			}
 
 			/* there could be more file descriptors here, in the form like:

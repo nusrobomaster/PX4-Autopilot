@@ -62,6 +62,7 @@ px4_add_board(
 	MODULES
 		commander
 		attitude_estimator_q
+		# airspeed_selector
 		dataman
 		ekf2
 		events
@@ -77,7 +78,7 @@ px4_add_board(
 		# mc_hover_thrust_estimator
 		# mc_pos_control
 		# mc_rate_control
-		# #micrortps_bridge
+		# micrortps_bridge
 		navigator
 		rc_update
 		rover_pos_control
@@ -91,12 +92,12 @@ px4_add_board(
 		# bl_update
 		#dmesg
 		# dumpfile
-		# esc_calib
+		esc_calib
 		gpio
 		# hardfault_log
 		# i2cdetect
 		# led_control
-		# mixer
+		mixer
 		# motor_ramp
 		# motor_test
 		# mtd

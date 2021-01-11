@@ -326,7 +326,7 @@ AirspeedModule::Run()
 			/* poll airspeed data */
 			airspeed_s airspeed_raw = {};
 			_airspeed_sub[i].copy(&airspeed_raw); // poll raw airspeed topic of the i-th sensor
-			input_data.airspeed_indicated_raw = airspeed_raw.indicated_airspeed_m_s;
+			input_data.airspeed_indicated_raw = airspeed_raw.indicated_airspeed_m_s; // we're just adding the keys as we go
 			input_data.airspeed_true_raw = airspeed_raw.true_airspeed_m_s;
 			input_data.airspeed_timestamp = airspeed_raw.timestamp;
 			input_data.air_temperature_celsius = airspeed_raw.air_temperature_celsius;

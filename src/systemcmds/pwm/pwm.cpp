@@ -16,17 +16,19 @@
  *    used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
- * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
- * COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
- * AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND Cif (print_verbose && set_mask > 0) {
+		PX4_INFO("Channels: ");
+		printf("    ");
+
+		for (unsigned i = 0; i < PWM_OUTPUT_MAX_CHANNELS; i++) {
+			if (set_mask & 1 << i) {
+				printf("%d ", i + 1);
+			}
+		}
+
+		printf("\n");
+	}
+ OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
  ****************************************************************************/
@@ -162,7 +164,7 @@ pwm_main(int argc, char *argv[])
 	int alt_rate = -1; // Default to indicate not set.
 	uint32_t alt_channel_groups = 0;
 	bool alt_channels_set = false;
-	bool print_verbose = false;
+	bool print_verbose = true;
 	bool error_on_warn = false;
 	bool oneshot = false;
 	int ch;
@@ -185,7 +187,7 @@ pwm_main(int argc, char *argv[])
 
 	while ((ch = px4_getopt(argc, argv, "d:vec:g:m:ap:r:", &myoptind, &myoptarg)) != EOF) {
 		switch (ch) {
-
+        // looks like px4_getopt allows us to get the user flag input
 		case 'd':
 			if (nullptr == strstr(myoptarg, "/dev/")) {
 				PX4_WARN("device %s not valid", myoptarg);
@@ -242,6 +244,7 @@ pwm_main(int argc, char *argv[])
 		case 'a':
 			for (unsigned i = 0; i < PWM_OUTPUT_MAX_CHANNELS; i++) {
 				set_mask |= 1 << i;
+				PX4_INFO("This is the set_mask command: %d", set_mask);
 			}
 
 			break;
@@ -308,14 +311,14 @@ pwm_main(int argc, char *argv[])
 	if (!strcmp(command, "arm")) {
 		/* tell safety that its ok to disable it with the switch */
 		ret = px4_ioctl(fd, PWM_SERVO_SET_ARM_OK, 0);
-
+		PX4_INFO("this is from arm command: %d",ret);
 		if (ret != OK) {
 			err(1, "PWM_SERVO_SET_ARM_OK");
 		}
 
 		/* tell IO that the system is armed (it will output values if safety is off) */
 		ret = px4_ioctl(fd, PWM_SERVO_ARM, 0);
-
+		PX4_INFO("%d",ret);
 		if (ret != OK) {
 			err(1, "PWM_SERVO_ARM");
 		}
