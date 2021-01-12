@@ -49,6 +49,7 @@ set(msg_files
 	collision_report.msg
 	commander_state.msg
 	cpuload.msg
+	can_motor.msg
 	debug_array.msg
 	debug_key_value.msg
 	debug_value.msg
