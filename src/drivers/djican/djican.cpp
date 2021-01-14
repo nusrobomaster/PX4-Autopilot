@@ -26,6 +26,7 @@
 
 using namespace time_literals;
 
+// for now uses work queue configuration: test1
 DjiCan::DjiCan() :
 	ModuleParams(nullptr),
 	ScheduledWorkItem(MODULE_NAME, px4::wq_configurations::test1)
@@ -53,21 +54,23 @@ int DjiCan::start_can()
 	struct can_msg_s rxmsg;
 
 	size_t msgsize;
-  size_t nbytes;
-  long nmsgs    = CONFIG_EXAMPLES_CAN_NMSGS;
-  long msgno;
-  int fd;
-  int errval    = 0;
-  int ret;
+	size_t nbytes;
+	long nmsgs    = 20;
+	long msgno;
+	int fd;
+	int errval    = 0;
+	int ret;
 
 	/* Initialization of the CAN hardware is performed by board-specific,
 	* logic external prior to running this test.
 	*/
 
-  /* Open the CAN device for reading */
+	/* Open the CAN device for reading
+	* Will hang if not connected to anything: to fix soon
+	*/
 
-  fd = open(CAN_DEVPATH, CAN_OFLAGS);
-  if (fd < 0)
+	fd = open(CAN_DEVPATH, CAN_OFLAGS);
+	if (fd < 0)
 	{
 		printf("ERROR: open %s failed: %d\n",
 						CAN_DEVPATH, errno);
@@ -79,13 +82,13 @@ int DjiCan::start_can()
 	* drivers will support this IOCTL.
 	*/
 
-  ret = ioctl(fd, CANIOC_GET_BITTIMING, (unsigned long)((uintptr_t)&bt));
+  	ret = ioctl(fd, CANIOC_GET_BITTIMING, (unsigned long)((uintptr_t)&bt));
 
 	if (ret < 0)
 	{
 		printf("Bit timing not available: %d\n", errno);
 	}
-  else
+	else
 	{
 		printf("Bit timing:\n");
 		printf("   Baud: %lu\n", (unsigned long)bt.bt_baud);
@@ -106,17 +109,19 @@ int DjiCan::start_can()
 			goto errout_with_dev;
 		}
 
+		PX4_INFO("Motor number: %d", rxmsg.cm_hdr.ch_id);
+
 		// show raw data as debug message
-		printf("  ID: %4u DLC: %u\n",
-						rxmsg.cm_hdr.ch_id, rxmsg.cm_hdr.ch_dlc);
-		printf("Data0: %d\n", rxmsg.cm_data[0]);
-		printf("Data1: %d\n", rxmsg.cm_data[1]);
-		printf("Data2: %d\n", rxmsg.cm_data[2]);
-		printf("Data3: %d\n", rxmsg.cm_data[3]);
-		printf("Data4: %d\n", rxmsg.cm_data[4]);
-		printf("Data5: %d\n", rxmsg.cm_data[5]);
-		printf("Data6: %d\n", rxmsg.cm_data[6]);
-		printf("Data7: %d\n", rxmsg.cm_data[7]);
+		// printf("  ID: %4u DLC: %u\n",
+		// 				rxmsg.cm_hdr.ch_id, rxmsg.cm_hdr.ch_dlc);
+		// printf("Data0: %d\n", rxmsg.cm_data[0]);
+		// printf("Data1: %d\n", rxmsg.cm_data[1]);
+		// printf("Data2: %d\n", rxmsg.cm_data[2]);
+		// printf("Data3: %d\n", rxmsg.cm_data[3]);
+		// printf("Data4: %d\n", rxmsg.cm_data[4]);
+		// printf("Data5: %d\n", rxmsg.cm_data[5]);
+		// printf("Data6: %d\n", rxmsg.cm_data[6]);
+		// printf("Data7: %d\n", rxmsg.cm_data[7]);
 
 		// publish can motor data
 		can_motor_s data{};
@@ -130,10 +135,10 @@ int DjiCan::start_can()
 	}
 
 errout_with_dev:
-  close(fd);
+	close(fd);
 
-  printf("Terminating!\n");
-  fflush(stdout);
+	printf("Terminating!\n");
+	fflush(stdout);
 
 	return errval;
 }
@@ -162,7 +167,6 @@ void DjiCan::Run()
 
 int DjiCan::task_spawn(int argc, char *argv[])
 {
-	PX4_INFO("djican spawn task");
 	DjiCan *instance = new DjiCan();
 	if (instance) {
 		_object.store(instance);
@@ -209,15 +213,67 @@ Start can driver communication.
 )DESCR_STR");
 
 	PRINT_MODULE_USAGE_NAME("djican", "template");
-	PRINT_MODULE_USAGE_COMMAND("start");
+	PRINT_MODULE_USAGE_COMMAND_DESCR("start", "listen to can motor signals");
+	PRINT_MODULE_USAGE_COMMAND_DESCR("send", "send data to can motor");
 	PRINT_MODULE_USAGE_DEFAULT_COMMANDS();
 
 	return 0;
 }
 
+static void send_can(char* string_value)
+{
+	PX4_INFO("Starting to send data: %s", string_value);
+	struct can_msg_s txmsg;
+	int msgdlc = 8;
+	size_t msgsize;
+	int fd;
+	size_t nbytes;
+
+	fd = open(CAN_DEVPATH, CAN_OFLAGS);
+	if (fd < 0)
+	{
+		printf("ERROR: open %s failed: %d\n",
+			CAN_DEVPATH, errno);
+	}
+
+	/* Construct the next TX message */
+	txmsg.cm_hdr.ch_id     = 0x200;
+	txmsg.cm_hdr.ch_rtr    = true;
+	txmsg.cm_hdr.ch_dlc    = msgdlc;
+
+	for (int i = 0; i < msgdlc; i++)
+        {
+          txmsg.cm_data[i] = 0;
+        }
+
+	int16_t actual_value = atoi(string_value);
+
+	// hard wired to only write to motor device id 2
+	txmsg.cm_data[2] = (actual_value >> 8);
+	txmsg.cm_data[3] = (actual_value & 0xff);
+
+	/* Send the TX message */
+
+	msgsize = CAN_MSGLEN(msgdlc);
+	nbytes = write(fd, &txmsg, msgsize);
+	if (nbytes != msgsize)
+	{
+		PX4_INFO("ERROR: write(%ld) returned %ld\n",
+			(long)msgsize, (long)nbytes);
+		// return 3
+	}
+	PX4_INFO("Value wrote to ESC");
+	// return 0;
+
+	close(fd);
+}
 
 extern "C" int djican_main(int argc, char *argv[])
 {
-	PX4_INFO("CAN driver start");
+	PX4_INFO("%d", strcmp(argv[1], "send"));
+	if (strcmp(argv[1], "send") == 0) {
+		send_can(argv[2]);
+		return 0;
+	}
 	return DjiCan::main(argc, argv);
 }
