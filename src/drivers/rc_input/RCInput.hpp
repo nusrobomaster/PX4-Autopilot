@@ -43,6 +43,7 @@
 #include <lib/rc/crsf.h>
 #include <lib/rc/dsm.h>
 #include <lib/rc/sbus.h>
+#include <lib/rc/dbus.h>
 #include <lib/rc/st24.h>
 #include <lib/rc/sumd.h>
 #include <px4_platform_common/px4_config.h>
@@ -93,16 +94,18 @@ private:
 		RC_SCAN_DSM,
 		RC_SCAN_SUMD,
 		RC_SCAN_ST24,
-		RC_SCAN_CRSF
-	} _rc_scan_state{RC_SCAN_SBUS};
+		RC_SCAN_CRSF,
+		RC_SCAN_DBUS
+	} _rc_scan_state{RC_SCAN_DBUS};
 
-	static constexpr char const *RC_SCAN_STRING[6] {
+	static constexpr char const *RC_SCAN_STRING[7] {
 		"PPM",
 		"SBUS",
 		"DSM",
 		"SUMD",
 		"ST24",
-		"CRSF"
+		"CRSF",
+		"DBUS"
 	};
 
 	hrt_abstime _rc_scan_begin{0};
