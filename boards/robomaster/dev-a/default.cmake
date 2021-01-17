@@ -13,8 +13,9 @@ px4_add_board(
 	TESTING
 	# UAVCAN_INTERFACES 2
 	SERIAL_PORTS
-		URT6:/dev/ttyS0
-		TEL1:/dev/ttyS1
+		RC:/dev/ttyS0
+		# URT6:/dev/ttyS1
+		# TEL1:/dev/ttyS2
 	DRIVERS
 		# adc
 		# barometer # all available barometer drivers
@@ -49,6 +50,7 @@ px4_add_board(
 		# pca9685
 		# #power_monitor/ina226
 		# #protocol_splitter
+		rc_input
 		pwm_input
 		pwm_out_sim
 		pwm_out

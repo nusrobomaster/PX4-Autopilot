@@ -200,8 +200,9 @@
 
 /* UARTs */
 
-// #define GPIO_USART1_RX   GPIO_USART1_RX_1    /* Console in from IO */
-// #define GPIO_USART1_TX   0                   /* USART1 is RX-only */
+#define GPIO_USART1_RX   GPIO_USART1_RX_2    /* DBUS Input */
+#define GPIO_USART1_TX   0                   /* USART1 is RX-only */
+
 
 // #define GPIO_USART2_RX   GPIO_USART2_RX_2
 // #define GPIO_USART2_TX   GPIO_USART2_TX_2
@@ -337,10 +338,5 @@
 # define PROBE(n,s)
 # define PROBE_MARK(n)
 #endif
-
-// DMA for USART
-
-#define DMAMAP_USART1_RX DMAMAP_USART1_RX_1
-
 
 #endif  /* __ARCH_BOARD_BOARD_H */

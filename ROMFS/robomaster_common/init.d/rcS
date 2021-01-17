@@ -19,7 +19,7 @@ set AUTOCNF no
 # set FMU_MODE pwm
 # set FRC /fs/microsd/etc/rc.txt
 # set IOFW "/etc/extras/px4_io-v2_default.bin"
-# set IO_PRESENT no
+set IO_PRESENT no
 # set LOG_FILE /fs/microsd/bootlog.txt
 # set LOGGER_ARGS ""
 # set LOGGER_BUF  14
@@ -242,6 +242,17 @@ fi
 unset BOARD_RC_MAVLINK
 
 
+#
+# Start UART/Serial device drivers.
+# Note: rc.serial is auto-generated from Tools/serial/generate_config.py
+#
+sh /etc/init.d/rc.serial
+
+
+
+# Must be started after the serial config is read
+rc_input start $RC_INPUT_ARGS
+# rc_input start /dev/ttyS0
 
 #
 # Configure vehicle type specific parameters.
@@ -283,7 +294,7 @@ unset AUTOCNF
 # unset FEXTRAS
 # unset FMU_MODE
 # unset FRC
-# unset IO_PRESENT
+unset IO_PRESENT
 # unset IOFW
 # unset LOG_FILE
 # unset LOGGER_ARGS
