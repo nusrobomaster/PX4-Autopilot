@@ -53,7 +53,7 @@
 #include <uORB/Subscription.hpp>
 #include <uORB/topics/parameter_update.h>
 #include <uORB/topics/sensor_combined.h>
-// #include <uORB/topics/actuator_controls.h>
+#include <uORB/topics/actuator_controls.h>
 #include <uORB/Publication.hpp>
 #include <uORB/topics/pwm_input.h>
 // #include <uORB/topics/manual_control_setpoint.h>
@@ -170,8 +170,13 @@ void Module::run()
 	orb_set_interval(pwm_input_sub, 1000);
 
 	//trying out actuator_controls
-	// struct actuator_controls_s act_controls = {}; 
-	// orb_advert_t _actuator_controls_pub = orb_advertise(ORB_ID(actuator_controls_0), &act_controls);
+	struct actuator_controls_s act_controls = {}; 
+	act_controls.timestamp = hrt_absolute_time();
+	act_controls.control[0] = 2000;
+	orb_advert_t _actuator_controls_pub = orb_advertise(ORB_ID(actuator_controls_0), &act_controls);
+
+	int act_ctl_sub =  orb_subscribe(ORB_ID(actuator_controls_0));
+	orb_set_interval(act_ctl_sub, 500);
 
 	//manual control
 	// struct manual_control_setpoint_s _manual_control_setpoint{};	
@@ -179,11 +184,13 @@ void Module::run()
 	// orb_advert_t _mc_pub = orb_advertise(ORB_ID(manual_control_setpoint), &_manual_control_setpoint);
 
 
-	px4_pollfd_struct_t fds[2]; // later change this to 2 so that they can subscribe to more polls
+	px4_pollfd_struct_t fds[3]; // later change this to 2 so that they can subscribe to more polls
 	fds[0].fd = sensor_combined_sub;
 	fds[0].events = POLLIN;
 	fds[1].fd = pwm_input_sub;
 	fds[1].events = POLLIN; 
+	fds[2].fd = act_ctl_sub;
+	fds[2].events = POLLIN;
 
 	// initialize parameters
 	parameters_update(true);
@@ -208,6 +215,10 @@ void Module::run()
 
 			struct sensor_combined_s sensor_combined;
 			orb_copy(ORB_ID(sensor_combined), sensor_combined_sub, &sensor_combined);
+			struct actuator_controls_s actctl;
+			orb_copy(ORB_ID(actuator_controls_0), act_ctl_sub, &actctl);
+			double temp = actctl.control[2];
+			PX4_INFO("Act: %f", temp);
 			// TODO: do something with the data...
 
 				PX4_INFO("Orginal Value: %d", decay);
@@ -217,8 +228,6 @@ void Module::run()
 				}
 				decay -= 50; 
 				PX4_INFO("New Value: %d", decay);
-				// act_controls.timestamp = hrt_absolute_time();
-				// act_controls.control[0] = 2000;
 				// act_controls.control[1] = 2000;
 				// act_controls.control[2] = 2000;
 				// act_controls.control[3] = 2000;
@@ -235,7 +244,7 @@ void Module::run()
 				pwm.pulse_width = decay;
 				pwm.period = 200;
 				orb_publish(ORB_ID(pwm_input), pwm_pub, &pwm);
-				// orb_publish(ORB_ID(actuator_controls_0), _actuator_controls_pub, &act_controls);
+				orb_publish(ORB_ID(actuator_controls_0), _actuator_controls_pub, &act_controls);
 				// orb_publish(ORB_ID(manual_control_setpoint), _mc_pub, &_manual_control_setpoint);
 
 		}

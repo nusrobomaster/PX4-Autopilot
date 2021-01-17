@@ -678,7 +678,7 @@ int io_timer_init_timer(unsigned timer)
 		 * default to updating at 50Hz
 		 */
 
-		timer_set_rate(timer, 50);
+		timer_set_rate(timer, 250);
 
 		/*
 		 * Note that the timer is left disabled with IRQ subs installed

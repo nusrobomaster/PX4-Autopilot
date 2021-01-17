@@ -521,13 +521,13 @@ RoverPositionControl::run()
 			    _control_mode.flag_control_position_enabled ||
 			    manual_mode) {
 				/* publish the actuator controls */
-				_act_controls.control[actuator_controls_s::GROUP_INDEX_GIMBAL] = 2000;
-				_act_controls.control[actuator_controls_s::INDEX_ROLL] = 1000;
-				_act_controls.control[actuator_controls_s::INDEX_PITCH] = -1000;
-				_act_controls.control[actuator_controls_s::INDEX_YAW] = 1000;
+				// _act_controls.control[actuator_controls_s::INDEX_ROLL] = 1000;
+				// _act_controls.control[actuator_controls_s::INDEX_PITCH] = -1000;
+				// _act_controls.control[actuator_controls_s::INDEX_YAW] = 1000;
+				// _act_controls.control[actuator_controls_s::GROUP_INDEX_GIMBAL] = 2000;
 				// must do this
-				_act_controls.control[actuator_controls_s::INDEX_THROTTLE] = 2000;
-				_actuator_controls_pub.publish(_act_controls); // the final line that will publish the message
+				// _act_controls.control[actuator_controls_s::INDEX_THROTTLE] = 2000;
+				// _actuator_controls_pub.publish(_act_controls); // the final line that will publish the message
 			}
 		}
 

@@ -23,7 +23,7 @@ px4_add_board(
 		camera_trigger
 		# differential_pressure # all available differential pressure drivers
 		# distance_sensor # all available distance sensor drivers
-		# dshot
+		dshot
 		# gps
 		# #heater
 		# #imu # all available imu drivers
@@ -122,7 +122,7 @@ px4_add_board(
 		# #matlab_csv_serial
 		# px4_mavlink_debug # Tutorial code from http://dev.px4.io/en/debug/debug_values.html
 		px4_simple_app # Tutorial code from http://dev.px4.io/en/apps/hello_sky.html
-		# # rover_steering_control # Rover example app
+		rover_steering_control # Rover example app
 		# uuv_example_app
 		work_item
 	)
