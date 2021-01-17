@@ -57,6 +57,7 @@
 #include <px4_platform_common/module_params.h>
 #include <uORB/Subscription.hpp>
 #include <uORB/Publication.hpp>
+#include <uORB/topics/input_rc.h>
 #include <uORB/topics/manual_control_setpoint.h>
 #include <uORB/topics/parameter_update.h>
 #include <uORB/topics/position_controller_status.h>
@@ -69,6 +70,7 @@
 #include <uORB/topics/vehicle_global_position.h>
 #include <uORB/topics/vehicle_local_position.h>
 #include <uORB/topics/actuator_controls.h>
+#include <uORB/topics/actuator_outputs.h>
 #include <uORB/topics/ekf2_timestamps.h>
 #include <uORB/uORB.h>
 
@@ -111,8 +113,10 @@ private:
 	int		_att_sp_sub{-1};
 	int		_vehicle_attitude_sub{-1};
 	int		_sensor_combined_sub{-1};
+	int 	_rc_input_sub{-1};
 
 	uORB::Subscription	_parameter_update_sub{ORB_ID(parameter_update)};
+	uORB::Subscription _actuator_controls_3_sub{ORB_ID(actuator_controls_3)};
 
 	manual_control_setpoint_s		_manual_control_setpoint{};			    /**< r/c channel data */
 	position_setpoint_triplet_s		_pos_sp_triplet{};		/**< triplet of mission items */
@@ -123,6 +127,8 @@ private:
 	actuator_controls_s				_act_controls{};		/**< direct control of actuators */
 	vehicle_attitude_s				_vehicle_att{};
 	sensor_combined_s				_sensor_combined{};
+	input_rc_s						_input_rc{};
+	actuator_controls_s				_act_ctl_3{};
 
 	SubscriptionData<vehicle_acceleration_s>		_vehicle_acceleration_sub{ORB_ID(vehicle_acceleration)};
 

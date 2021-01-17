@@ -356,6 +356,7 @@ RoverPositionControl::run()
 	_manual_control_setpoint_sub = orb_subscribe(ORB_ID(manual_control_setpoint));
 	_pos_sp_triplet_sub = orb_subscribe(ORB_ID(position_setpoint_triplet));
 	_att_sp_sub = orb_subscribe(ORB_ID(vehicle_attitude_setpoint));
+	_rc_input_sub =  orb_subscribe(ORB_ID(input_rc));
 
 	_vehicle_attitude_sub = orb_subscribe(ORB_ID(vehicle_attitude));
 	_sensor_combined_sub = orb_subscribe(ORB_ID(sensor_combined));
@@ -370,7 +371,7 @@ RoverPositionControl::run()
 	parameters_update(true);
 
 	/* wakeup source(s) */
-	px4_pollfd_struct_t fds[5];
+	px4_pollfd_struct_t fds[6];
 
 	/* Setup of loop */
 	fds[0].fd = _global_pos_sub;
@@ -383,6 +384,8 @@ RoverPositionControl::run()
 	fds[3].events = POLLIN;
 	fds[4].fd = _local_pos_sub;  // Added local position as source of position
 	fds[4].events = POLLIN;
+	fds[5].fd = _rc_input_sub; 	// create the rc file descriptor
+	fds[5].events = POLLIN;
 
 	while (!should_exit()) {
 
@@ -499,7 +502,7 @@ RoverPositionControl::run()
 
 			if (manual_mode) {
 				/* manual/direct control */
-				//PX4_INFO("Manual mode!");
+				PX4_INFO("Manual mode!");
 				_act_controls.control[actuator_controls_s::INDEX_ROLL] = _manual_control_setpoint.y;
 				_act_controls.control[actuator_controls_s::INDEX_PITCH] = -_manual_control_setpoint.x;
 				_act_controls.control[actuator_controls_s::INDEX_YAW] = _manual_control_setpoint.r; //TODO: Readd yaw scale param, i guess
@@ -511,6 +514,9 @@ RoverPositionControl::run()
 		if (fds[2].revents & POLLIN) {
 
 			orb_copy(ORB_ID(sensor_combined), _sensor_combined_sub, &_sensor_combined);
+			if(fds[5].events & POLLIN){
+				orb_copy(ORB_ID(input_rc), _rc_input_sub, &_input_rc);
+			}
 
 			//orb_copy(ORB_ID(vehicle_attitude), _vehicle_attitude_sub, &_vehicle_att);
 			_act_controls.timestamp = hrt_absolute_time();
@@ -521,13 +527,13 @@ RoverPositionControl::run()
 			    _control_mode.flag_control_position_enabled ||
 			    manual_mode) {
 				/* publish the actuator controls */
-				// _act_controls.control[actuator_controls_s::INDEX_ROLL] = 1000;
-				// _act_controls.control[actuator_controls_s::INDEX_PITCH] = -1000;
-				// _act_controls.control[actuator_controls_s::INDEX_YAW] = 1000;
+				_act_controls.control[actuator_controls_s::INDEX_ROLL] = _input_rc.values[0];
+				_act_controls.control[actuator_controls_s::INDEX_PITCH] = _input_rc.values[1];
+				_act_controls.control[actuator_controls_s::INDEX_YAW] = _input_rc.values[2];
 				// _act_controls.control[actuator_controls_s::GROUP_INDEX_GIMBAL] = 2000;
 				// must do this
-				// _act_controls.control[actuator_controls_s::INDEX_THROTTLE] = 2000;
-				// _actuator_controls_pub.publish(_act_controls); // the final line that will publish the message
+				_act_controls.control[actuator_controls_s::INDEX_THROTTLE] = _input_rc.values[3];
+				_actuator_controls_pub.publish(_act_controls); // the final line that will publish the message
 			}
 		}
 
