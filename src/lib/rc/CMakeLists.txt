@@ -36,6 +36,7 @@ add_library(rc
 	st24.cpp
 	sumd.cpp
 	sbus.cpp
+	dbus.cpp
 	dsm.cpp
 	common_rc.cpp
 )
