@@ -1,5 +1,6 @@
 
-#define CAN_DEVPATH "/dev/can0"
+#define CAN_DEVPATH "/dev/can_output"
+#define PX4FMU_DEVICE_PATH "/dev/px4fmu"
 #define CAN_OFLAGS O_RDWR
 
 #include "djican.hpp"
@@ -26,24 +27,51 @@
 
 using namespace time_literals;
 
+#define CAN_MOTOR_CURRENT_MIN 0
+
 // for now uses work queue configuration: test1
 DjiCan::DjiCan() :
-	ModuleParams(nullptr),
-	ScheduledWorkItem(MODULE_NAME, px4::wq_configurations::test1)
+	CDev(PX4FMU_DEVICE_PATH),
+	OutputModuleInterface(MODULE_NAME, px4::wq_configurations::test1),
+	_cycle_perf(perf_alloc(PC_ELAPSED, MODULE_NAME": cycle")),
+	_interval_perf(perf_alloc(PC_INTERVAL, MODULE_NAME": interval"))
 {
+	_mixing_output.setAllMinValues(CAN_MOTOR_CURRENT_MIN);
+	_mixing_output.setAllMaxValues(0);
 }
 
 DjiCan::~DjiCan()
 {
-	perf_free(_loop_perf);
-	perf_free(_loop_interval_perf);
+	/* clean up the alternate device node */
+	unregister_class_devname(CAN_DEVPATH, _class_instance);
+
+	perf_free(_cycle_perf);
+	perf_free(_interval_perf);
 }
 
-bool DjiCan::init()
+int DjiCan::init()
 {
-	ScheduleOnInterval(100_ms); // 10Hz rate
+	/* do regular cdev init */
+	int ret = CDev::init();
 
-	return true;
+	if (ret != OK) {
+		return ret;
+	}
+
+	/* try to claim the generic PWM output device node as well - it's OK if we fail at this */
+	_class_instance = register_class_devname(CAN_DEVPATH);
+
+	if (_class_instance == 0) {
+		/* lets not be too verbose */
+	} else if (_class_instance < 0) {
+		PX4_ERR("FAILED registering class device");
+	}
+
+	_mixing_output.setDriverInstance(_class_instance);
+
+	ScheduleNow();
+
+	return 0;
 }
 
 int DjiCan::start_can()
@@ -69,7 +97,7 @@ int DjiCan::start_can()
 	* Will hang if not connected to anything: to fix soon
 	*/
 
-	fd = open(CAN_DEVPATH, CAN_OFLAGS);
+	fd = ::open("/dev/can0", CAN_OFLAGS);
 	if (fd < 0)
 	{
 		printf("ERROR: open %s failed: %d\n",
@@ -82,7 +110,7 @@ int DjiCan::start_can()
 	* drivers will support this IOCTL.
 	*/
 
-  	ret = ioctl(fd, CANIOC_GET_BITTIMING, (unsigned long)((uintptr_t)&bt));
+  	ret = ::ioctl(fd, CANIOC_GET_BITTIMING, (unsigned long)((uintptr_t)&bt));
 
 	if (ret < 0)
 	{
@@ -100,7 +128,7 @@ int DjiCan::start_can()
 	for (msgno = 0; !nmsgs || msgno < nmsgs; msgno++)
 	{
 		msgsize = sizeof(struct can_msg_s);
-		nbytes = read(fd, &rxmsg, msgsize);
+		nbytes = ::read(fd, &rxmsg, msgsize);
 		if (nbytes < CAN_MSGLEN(0) || nbytes > msgsize)
 		{
 			printf("ERROR: read(%ld) returned %ld\n",
@@ -135,7 +163,7 @@ int DjiCan::start_can()
 	}
 
 errout_with_dev:
-	close(fd);
+	::close(fd);
 
 	printf("Terminating!\n");
 	fflush(stdout);
@@ -145,24 +173,30 @@ errout_with_dev:
 
 void DjiCan::Run()
 {
-	PX4_INFO("CAN driver running routine");
 	if (should_exit()) {
 		ScheduleClear();
 		exit_and_cleanup();
 		return;
 	}
 
-	perf_begin(_loop_perf);
-	perf_count(_loop_interval_perf);
+	perf_begin(_cycle_perf);
+	perf_count(_interval_perf);
+
+	// push backup schedule
+	ScheduleDelayed(_backup_schedule_interval_us);
+
+	_mixing_output.update();
 
 	// code to start can communication
-	this->start_can();
+	//this->start_can();
 
-	uint64_t time_now = hrt_absolute_time();
-	PX4_INFO("%llu\n", time_now); // this should print out from syslog
+	// uint64_t time_now = hrt_absolute_time();
+	// PX4_INFO("%llu\n", time_now); // this should print out from syslog
 
+	// check at end of cycle (updateSubscriptions() can potentially change to a different WorkQueue thread)
+	_mixing_output.updateSubscriptions(true, true);
 
-	perf_end(_loop_perf);
+	perf_end(_cycle_perf);
 }
 
 int DjiCan::task_spawn(int argc, char *argv[])
@@ -172,7 +206,7 @@ int DjiCan::task_spawn(int argc, char *argv[])
 		_object.store(instance);
 		_task_id = task_id_is_work_queue;
 
-		if (instance->init()) {
+		if (instance->init() == PX4_OK) {
 			return PX4_OK;
 		}
 
@@ -189,8 +223,8 @@ int DjiCan::task_spawn(int argc, char *argv[])
 
 int DjiCan::print_status()
 {
-	perf_print_counter(_loop_perf);
-	perf_print_counter(_loop_interval_perf);
+	perf_print_counter(_cycle_perf);
+	perf_print_counter(_interval_perf);
 	return 0;
 }
 
@@ -218,6 +252,26 @@ Start can driver communication.
 	PRINT_MODULE_USAGE_DEFAULT_COMMANDS();
 
 	return 0;
+}
+
+bool DjiCan::updateOutputs(bool stop_motors, uint16_t outputs[MAX_ACTUATORS],
+			   unsigned num_outputs, unsigned num_control_groups_updated)
+{
+	/* output to the motors */
+	// must set value for each individual motors
+	for (size_t i = 0; i < num_outputs; i++) {
+		// send message to can motor
+		send_motor_data(i, outputs[i]);
+	}
+	// PX4_INFO("subscribed actuator control0: %d", _mixing_output._control_subs[0].control);
+	_mixing_output.printStatus();
+	return true;
+}
+
+void DjiCan::send_motor_data(size_t channel, uint16_t output_data) {
+	if (output_data != 0) {
+		PX4_INFO("Data for channel %d is: %d", channel, output_data);
+	}
 }
 
 static void send_can(char* string_value)
@@ -266,6 +320,42 @@ static void send_can(char* string_value)
 	// return 0;
 
 	close(fd);
+}
+
+int DjiCan::ioctl(file *filp, int cmd, unsigned long arg)
+{
+	int ret;
+	ret = can_ioctl(filp, cmd, arg);
+	return ret;
+}
+
+int DjiCan::can_ioctl(file *filp, int cmd, unsigned long arg)
+{
+	int ret = OK;
+
+	PX4_INFO("ioctl cmd: %d, arg: %ld", cmd, arg);
+
+	lock();
+
+	switch (cmd) {
+	case MIXERIOCRESET:
+		_mixing_output.resetMixerThreadSafe();
+		break;
+	case MIXERIOCLOADBUF: {
+		const char *buf = (const char *)arg;
+		unsigned buflen = strlen(buf);
+		ret = _mixing_output.loadMixerThreadSafe(buf, buflen);
+
+		break;
+	}
+	default:
+		ret = -ENOTTY;
+		break;
+	}
+
+	unlock();
+
+	return ret;
 }
 
 extern "C" int djican_main(int argc, char *argv[])
