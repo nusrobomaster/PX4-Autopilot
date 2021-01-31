@@ -59,7 +59,6 @@ _control_latency_perf(perf_alloc(PC_ELAPSED, "control latency"))
 {
 	output_limit_init(&_output_limit);
 	_output_limit.ramp_up = ramp_up;
-
 	/* Safely initialize armed flags */
 	_armed.armed = false;
 	_armed.prearmed = false;
@@ -342,10 +341,11 @@ bool MixingOutput::update()
 	// check for motor test
 	if (!_armed.armed && !_armed.manual_lockdown) {
 		unsigned num_motor_test = motorTest();
-
+		// PX4_INFO("f: %d", _current_output_value[0]);
 		if (num_motor_test > 0) {
 			if (_interface.updateOutputs(false, _current_output_value, num_motor_test, 1)) {
 				actuator_outputs_s actuator_outputs{};
+				actuator_outputs.output[0] = _controls[0].control[0];
 				setAndPublishActuatorOutputs(num_motor_test, actuator_outputs);
 			}
 
@@ -365,6 +365,8 @@ bool MixingOutput::update()
 		if (_groups_subscribed & (1 << i)) {
 			if (_control_subs[i].copy(&_controls[i])) {
 				n_updates++;
+				// int test =  _controls[i].control[0];
+					// PX4_INFO("i: %d", test);
 			}
 
 			/* During ESC calibration, we overwrite the throttle value. */
@@ -410,6 +412,7 @@ bool MixingOutput::update()
 
 	/* apply _param_mot_ordering */
 	reorderOutputs(_current_output_value);
+	// PX4_INFO("Current output value:%d", _current_output_value[0]);
 
 	/* now return the outputs to the driver */
 	if (_interface.updateOutputs(stop_motors, _current_output_value, mixed_num_outputs, n_updates)) {

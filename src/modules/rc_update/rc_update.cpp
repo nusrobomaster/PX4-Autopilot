@@ -443,7 +443,6 @@ RCUpdate::Run()
 
 		/* only publish manual control if the signal is still present and was present once */
 		if (!signal_lost && rc_input.timestamp_last_signal > 0) {
-
 			/* initialize manual setpoint */
 			manual_control_setpoint_s manual_control_setpoint{};
 			/* set mode slot to unassigned */

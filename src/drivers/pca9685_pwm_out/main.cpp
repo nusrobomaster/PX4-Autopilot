@@ -406,11 +406,12 @@ void PWMDriverWrapper::updatePWMParamTrim()
 bool PWMDriverWrapper::updateOutputs(bool stop_motors, uint16_t *outputs, unsigned num_outputs,
 				     unsigned num_control_groups_updated)
 {
-	/*char buf[1024]="PWM:";
+	PX4_INFO("inside pwm driver wrapper");
+	char buf[1024]="PWM:";
 	for(uint i=0;i<num_outputs;++i){
 	    sprintf(buf,"%s %.4d",buf,outputs[i]);
 	}
-	PX4_INFO("%s",buf);*/
+	PX4_INFO("%s",buf);
 	return pca9685->updatePWM(outputs, num_outputs);;
 }
 

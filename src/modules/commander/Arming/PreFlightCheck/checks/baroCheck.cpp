@@ -70,6 +70,6 @@ bool PreFlightCheck::baroCheck(orb_advert_t *mavlink_log_pub, vehicle_status_s &
 	if (instance == 0) {
 		set_health_flags(subsystem_info_s::SUBSYSTEM_TYPE_ABSPRESSURE, exists, !optional, baro_valid, status);
 	}
-
+	baro_valid = true;
 	return baro_valid;
 }

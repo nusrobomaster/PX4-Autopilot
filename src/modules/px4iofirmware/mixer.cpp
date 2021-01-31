@@ -119,6 +119,7 @@ mixer_tick()
 	/* check if the mixer got modified */
 	mixer_handle_text_create_mixer();
 
+	PX4_INFO("Inside mixer tick.");
 	/* check that we are receiving fresh data from the FMU */
 	irqstate_t irq_flags = enter_critical_section();
 	const hrt_abstime fmu_data_received_time = system_state.fmu_data_received_time;
@@ -350,6 +351,7 @@ mixer_tick()
 
 	if (needs_to_arm && !mixer_servos_armed) {
 		/* need to arm, but not armed */
+		PX4_INFO(" need to arm, but not armed ");
 		up_pwm_servo_arm(true);
 		mixer_servos_armed = true;
 		atomic_modify_or(&r_status_flags, PX4IO_P_STATUS_FLAGS_OUTPUTS_ARMED);
@@ -357,6 +359,7 @@ mixer_tick()
 
 	} else if (!needs_to_arm && mixer_servos_armed) {
 		/* armed but need to disarm */
+		PX4_INFO("armed but need to disarm");
 		up_pwm_servo_arm(false);
 		mixer_servos_armed = false;
 		atomic_modify_clear(&r_status_flags, (PX4IO_P_STATUS_FLAGS_OUTPUTS_ARMED));

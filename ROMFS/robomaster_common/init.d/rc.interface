@@ -1,0 +1,93 @@
+#!/bin/sh
+#
+# Script to configure control interfaces.
+#
+#
+# NOTE: environment variable references:
+#  If the dollar sign ('$') is followed by a left bracket ('{') then the
+#  variable name is terminated with the right bracket character ('}').
+#  Otherwise, the variable name goes to the end of the argument.
+#
+
+echo "rc.interface"
+
+set OUTPUT_CMD pwm_out
+set MIXER rover_generic
+# set OUTPUT_DEV /dev/pwm_output0
+set OUTPUT_AUX_DEV none
+
+
+# USE_IO is set to 'no' for all boards w/o px4io driver or SYS_USE_IO disabled
+# since we do not have a px4io driver
+if [ $USE_IO = no ]
+then
+	set MIXER_AUX none
+fi
+
+#
+# Set the default output mode if none was set.
+#
+if [ $OUTPUT_MODE = none ]
+then
+    set OUTPUT_MODE pwm_out
+fi
+
+#
+# If OUTPUT_MODE = none then something is wrong with setup and we shouldn't try to enable output.
+#
+if [ $OUTPUT_MODE != none ]
+then
+    if [ $OUTPUT_MODE = $OUTPUT_CMD ]
+	then
+		if ! $OUTPUT_CMD mode_$FMU_MODE 
+		then
+			echo "$OUTPUT_CMD start failed" >> $LOG_FILE
+			# Error tune.
+			tune_control play -t 2
+		fi
+	fi
+
+if [ $MIXER != none -a $MIXER != skip ]
+then 
+    #
+	# Load main mixer.
+	#
+    echo "$MIXER"
+    set MIXER_FILE /etc/mixers/${MIXER}.main.mix
+
+
+    if [ $OUTPUT_MODE = pwm_out]
+    then    
+		set OUTPUT_DEV /dev/pwm_output0
+    fi
+
+    if [ $OUTPUT_MODE = mkblctrl ]
+	then
+		set OUTPUT_DEV /dev/mkblctrl0
+	fi
+
+	if [ $OUTPUT_MODE = uavcan_esc ]
+	then
+		set OUTPUT_DEV /dev/uavcan/esc
+	fi
+
+	if [ $OUTPUT_MODE = tap_esc ]
+	then
+		set OUTPUT_DEV /dev/tap_esc
+	fi
+
+    if mixer load /dev/pwm_output0 /etc/mixers/rover_generic.main.mix
+	then
+		echo "INFO  [init] Mixer: ${MIXER_FILE} on ${OUTPUT_DEV}"
+	else
+		echo "ERROR  [init] Failed loading mixer: ${MIXER_FILE}"
+		echo "ERROR  [init] Failed loading mixer: ${MIXER_FILE}" >> $LOG_FILE
+		tune_control play -t 20
+	fi
+
+fi
+
+unset OUTPUT_CMD
+unset MIXER_AUX_FILE
+unset OUTPUT_AUX_DEV
+unset OUTPUT_DEV

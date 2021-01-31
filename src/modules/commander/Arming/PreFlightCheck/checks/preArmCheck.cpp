@@ -169,6 +169,6 @@ bool PreFlightCheck::preArmCheck(orb_advert_t *mavlink_log_pub, const vehicle_st
 		}
 	}
 
-
+	prearm_ok = true;
 	return prearm_ok;
 }

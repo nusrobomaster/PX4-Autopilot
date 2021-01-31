@@ -562,6 +562,7 @@ bool PWMOut::updateOutputs(bool stop_motors, uint16_t outputs[MAX_ACTUATORS],
 	if (_pwm_initialized) {
 		PX4_INFO("Here updateOutputs.");
 		for (size_t i = 0; i < math::min(_num_outputs, num_outputs); i++) {
+			PX4_INFO("output value%d: %d", i , outputs[i]);
 			up_pwm_servo_set(i, outputs[i]);
 		}
 	}

@@ -340,7 +340,8 @@ else
 	# RC update (map raw RC input to calibrate manual control)
 	#  start before commander
 	#
-	rc_update start
+	rc_update starts
+
 
 	#
 	# Sensors System (start before Commander so Preflight checks are properly run).

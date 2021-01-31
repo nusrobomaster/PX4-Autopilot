@@ -1654,10 +1654,12 @@ Commander::run()
 				if (_param_com_disarm_land.get() > 0 && _have_taken_off_since_arming) {
 					_auto_disarm_landed.set_hysteresis_time_from(false, _param_com_disarm_land.get() * 1_s);
 					_auto_disarm_landed.set_state_and_update(_land_detector.landed, hrt_absolute_time());
+					PX4_INFO("Inside land");
 
 				} else if (_param_com_disarm_preflight.get() > 0 && !_have_taken_off_since_arming) {
 					_auto_disarm_landed.set_hysteresis_time_from(false, _param_com_disarm_preflight.get() * 1_s);
 					_auto_disarm_landed.set_state_and_update(true, hrt_absolute_time());
+					PX4_INFO("Inside preflight");
 				}
 
 				if (_auto_disarm_landed.get_state()) {

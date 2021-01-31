@@ -55,7 +55,7 @@ px4_add_board(
 		pwm_out_sim
 		pwm_out
 		# px4io
-		# roboclaw
+		roboclaw
 		# tap_esc
 		# telemetry # all available telemetry drivers
 		# test_ppm
@@ -87,7 +87,7 @@ px4_add_board(
 		sensors
 		# sih
 		# temperature_compensation
-		# vmount
+		vmount
 		# vtol_att_control
 		move_motor
 	SYSTEMCMDS

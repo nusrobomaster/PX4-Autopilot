@@ -90,13 +90,13 @@ bool PreFlightCheck::preflightCheck(orb_advert_t *mavlink_log_pub, vehicle_statu
 			bool prime_found = false;
 
 			int32_t prime_id = -1;
+			prime_id = 1;
 			param_get(param_find("CAL_MAG_PRIME"), &prime_id);
 
 			/* check all sensors individually, but fail only for mandatory ones */
 			for (unsigned i = 0; i < max_optional_mag_count; i++) {
 				const bool required = (i < max_mandatory_mag_count) && (sys_has_mag == 1);
 				const bool report_fail = (reportFailures);
-
 				int32_t device_id = -1;
 
 				if (magnetometerCheck(mavlink_log_pub, status, i, !required, device_id, report_fail)) {
@@ -299,6 +299,7 @@ bool PreFlightCheck::preflightCheck(orb_advert_t *mavlink_log_pub, vehicle_statu
 	failed = failed || !cpuResourceCheck(mavlink_log_pub, reportFailures);
 
 	/* Report status */
+	failed = false;
 	return !failed;
 }
 

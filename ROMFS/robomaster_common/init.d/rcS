@@ -16,20 +16,20 @@ set AUTOCNF no
 # set FAILSAFE_AUX none
 # set FCONFIG /fs/microsd/etc/config.txt
 # set FEXTRAS /fs/microsd/etc/extras.txt
-# set FMU_MODE pwm
+set FMU_MODE pwm
 # set FRC /fs/microsd/etc/rc.txt
 # set IOFW "/etc/extras/px4_io-v2_default.bin"
 set IO_PRESENT no
 # set LOG_FILE /fs/microsd/bootlog.txt
 # set LOGGER_ARGS ""
 # set LOGGER_BUF  14
-# set MAV_TYPE none
-# set MIXER none
-# set MIXER_AUX none
-# set MIXER_FILE none
+set MAV_TYPE 10
+set MIXER rover_generic
+set MIXER_AUX none
+set MIXER_FILE none
 # set MK_MODE none
 # set MKBLCTRL_ARG ""
-# set OUTPUT_MODE none
+set OUTPUT_MODE none
 # set PARAM_FILE /fs/microsd/params
 # set PWM_AUX_DISARMED p:PWM_AUX_DISARMED
 # set PWM_AUX_MAX p:PWM_AUX_MAX
@@ -39,12 +39,12 @@ set IO_PRESENT no
 # set PWM_DISARMED p:PWM_DISARMED
 # set PWM_MAX p:PWM_MAX
 # set PWM_MIN p:PWM_MIN
-# set PWM_OUT none
+set PWM_OUT 1234
 # set PWM_RATE p:PWM_RATE
 # set RC_INPUT_ARGS ""
 # set SDCARD_MIXERS_PATH /fs/microsd/etc/mixers
 set STARTUP_TUNE 1
-# set USE_IO no
+set USE_IO no
 set VEHICLE_TYPE none
 
 # Airframe parameter versioning: airframe maintainers can set this in the
@@ -93,7 +93,7 @@ fi
 # Needs to be started after the parameters are loaded (for CBRK_BUZZER).
 # Note that this will still play the already published startup tone.
 #
-# tone_alarm start
+tone_alarm start
 
 #
 # Play the startup tune (if not disabled or there is an error)
@@ -162,7 +162,11 @@ sensors start
 #
 rc_update start
 
-
+	#activating the pwm 
+	# pwm_out mode_pwm
+	# pwm arm -a
+	#loading the mixer
+	# mixer append /dev/pwm_output0 /etc/mixers/rover_generic.main.mix
 
 #
 # board sensors: rc.sensors

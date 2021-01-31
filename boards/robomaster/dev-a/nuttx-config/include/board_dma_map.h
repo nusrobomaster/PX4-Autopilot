@@ -48,7 +48,7 @@
 |            |   TIM5_UP_1      |   TIM5_TRIG_1    |                  |   TIM5_TRIG_2    |                  |                  |                  |                  |
 | Channel 7  | -                | TIM6_UP          | I2C2_RX          | I2C2_RX_1        | USART3_TX_2      | DAC1             | DAC2             | I2C2_TX          |
 |            |                  |                  |                  |                  |                  |                  |                  |                  |
-| Usage      | UART8_TX         | UART7_TX         | I2C2_RX          | UART7_RX         |                  |                  | UART8_RX         | TIM2_UP_2          |
+| Usage      | TIM5_UP_1        | UART7_TX         | I2C2_RX          | UART7_RX         |                  |                  | TIM4_UP          | TIM2_UP_2          |
 |    DMA2    | Stream 0         | Stream 1         | Stream 2         | Stream 3         | Stream 4         | Stream 5         | Stream 6         | Stream 7         |
 |------------|------------------|------------------|------------------|------------------|------------------|------------------|------------------|------------------|
 | Channel 0  | ADC1_1           | SAI1_A           | TIM8_CH1_1       | SAI1_A_1         | ADC1_2           | SAI1_B_1         | TIM1_CH1_1       | -                |
