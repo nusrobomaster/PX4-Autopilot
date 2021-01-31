@@ -295,6 +295,15 @@
 #define GPIO_USART6_RX GPIO_USART6_RX_2
 #define GPIO_USART6_TX GPIO_USART6_TX_2
 
+
+/* DBUS
+ *
+ * USART3 RX: PC11
+ */
+#define GPIO_USART3_RX GPIO_USART3_RX_2
+#define GPIO_USART3_TX 0
+
+
 /* PWM
  *
  * The STM3240G-Eval has no real on-board PWM devices, but the board can be
@@ -468,7 +477,7 @@
 #define GPIO_SPI1_MOSI    GPIO_SPI1_MOSI_1
 
 // dma stuff
-#define DMAMAP_USART1_RX DMAMAP_USART1_RX_2
+// #define DMAMAP_USART1_RX DMAMAP_USART1_RX_2
 // #define DMAMAP_USART6_RX DMAMAP_USART6_RX_2
 
 /* DMA Channel/Stream Selections *****************************************************/

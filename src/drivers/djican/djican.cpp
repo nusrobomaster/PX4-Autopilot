@@ -264,7 +264,7 @@ bool DjiCan::updateOutputs(bool stop_motors, uint16_t outputs[MAX_ACTUATORS],
 		send_motor_data(i, outputs[i]);
 	}
 	// PX4_INFO("subscribed actuator control0: %d", _mixing_output._control_subs[0].control);
-	_mixing_output.printStatus();
+	// _mixing_output.printStatus();
 	return true;
 }
 
@@ -283,7 +283,7 @@ static void send_can(char* string_value)
 	int fd;
 	size_t nbytes;
 
-	fd = open(CAN_DEVPATH, CAN_OFLAGS);
+	fd = open("/dev/can0", CAN_OFLAGS);
 	if (fd < 0)
 	{
 		printf("ERROR: open %s failed: %d\n",

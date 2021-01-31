@@ -41,7 +41,7 @@ set OUTPUT_MODE none
 # set PWM_MIN p:PWM_MIN
 # set PWM_OUT none
 # set PWM_RATE p:PWM_RATE
-# set RC_INPUT_ARGS ""
+set RC_INPUT_ARGS ""
 # set SDCARD_MIXERS_PATH /fs/microsd/etc/mixers
 set STARTUP_TUNE 1
 # set USE_IO no
@@ -93,7 +93,7 @@ fi
 # Needs to be started after the parameters are loaded (for CBRK_BUZZER).
 # Note that this will still play the already published startup tone.
 #
-tone_alarm start
+# tone_alarm start
 
 #
 # Play the startup tune (if not disabled or there is an error)
@@ -203,8 +203,9 @@ sh /etc/init.d/rc.serial
 
 
 # Must be started after the serial config is read
-rc_input start $RC_INPUT_ARGS
-# rc_input start /dev/ttyS0
+echo $RC_INPUT_ARGS
+# rc_input start $RC_INPUT_ARGS
+# rc_input start -d /dev/ttyS0
 
 #
 # Configure vehicle type specific parameters.
@@ -270,7 +271,7 @@ unset PARAM_DEFAULTS_VER
 # unset PWM_MIN
 # unset PWM_OUT
 # unset PWM_RATE
-# unset RC_INPUT_ARGS
+unset RC_INPUT_ARGS
 # unset SDCARD_MIXERS_PATH
 unset STARTUP_TUNE
 # unset USE_IO
