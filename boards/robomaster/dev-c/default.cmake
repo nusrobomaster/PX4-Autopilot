@@ -12,7 +12,8 @@ px4_add_board(
 	TESTING
 	# UAVCAN_INTERFACES 2
 	SERIAL_PORTS
-		URT6:/dev/ttyS0
+		RC:/dev/ttyS0
+		# URT6:/dev/ttyS0
 	DRIVERS
 		# adc
 		# barometer # all available barometer drivers
@@ -47,6 +48,8 @@ px4_add_board(
 		# test_ppm
 		tone_alarm
 		# uavcan
+		djican
+		rc_input
 	MODULES
 		commander
 		attitude_estimator_q
@@ -83,7 +86,7 @@ px4_add_board(
 		# hardfault_log
 		i2cdetect
 		# led_control
-		# mixer
+		mixer
 		# motor_ramp
 		# motor_test
 		# mtd
