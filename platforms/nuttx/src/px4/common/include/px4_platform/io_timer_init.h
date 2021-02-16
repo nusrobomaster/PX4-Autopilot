@@ -60,6 +60,8 @@ static inline constexpr io_timers_channel_mapping_t initIOTimerChannelMapping(co
 		uint32_t first_channel = UINT32_MAX;
 		uint32_t channel_count = 0;
 
+
+		// MAX_TIMER_IO_CHANNELS is 8 here since DIRECT_PWM_OUTPUT_CHANNELS is 4 in board_config.h
 		for (uint32_t channel = 0; channel < MAX_TIMER_IO_CHANNELS; ++channel) {
 			if (timer_io_channels_conf[channel].gpio_in == 0 && timer_io_channels_conf[channel].gpio_out == 0) {
 				break;

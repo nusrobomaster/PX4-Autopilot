@@ -18,7 +18,7 @@ px4_add_board(
 		# barometer # all available barometer drivers
 		# batt_smbus
 		# camera_capture
-		# camera_trigger
+		camera_trigger
 		# differential_pressure # all available differential pressure drivers
 		# distance_sensor # all available distance sensor drivers
 		# dshot
@@ -79,7 +79,7 @@ px4_add_board(
 		#dmesg
 		# dumpfile
 		# esc_calib
-		# gpio
+		gpio
 		# hardfault_log
 		i2cdetect
 		# led_control
@@ -90,7 +90,7 @@ px4_add_board(
 		# nshterm
 		param
 		# perf
-		# pwm
+		pwm
 		reboot
 		# reflect
 		# sd_bench
@@ -104,6 +104,7 @@ px4_add_board(
 	EXAMPLES
 		# fixedwing_control # Tutorial code from https://px4.io/dev/example_fixedwing_control
 		hello
+		# pwm_main
 		# hwtest # Hardware test
 		# #matlab_csv_serial
 		px4_mavlink_debug # Tutorial code from http://dev.px4.io/en/debug/debug_values.html
